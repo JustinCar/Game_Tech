@@ -61,6 +61,10 @@ namespace NCL {
 				localOrientation = newOr;
 			}
 
+			void SetWorldOrientation(const Quaternion& newOr) {
+				worldOrientation = newOr;
+			}
+
 			Quaternion GetWorldOrientation() const {
 				return worldOrientation;
 			}

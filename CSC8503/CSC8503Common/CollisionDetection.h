@@ -19,10 +19,10 @@ namespace NCL {
 	{
 	public:
 		struct ContactPoint {
-			Vector3 localA;
-			Vector3 localB;
+			Vector3 position;
 			Vector3 normal;
-			float	penetration;
+			float penetration;
+
 		};
 		struct CollisionInfo {
 			GameObject* a;
@@ -31,11 +31,10 @@ namespace NCL {
 
 			ContactPoint point;
 
-			void AddContactPoint(const Vector3& localA, const Vector3& localB, const Vector3& normal, float p) {
-				point.localA		= localA;
-				point.localB		= localB;
-				point.normal		= normal;
-				point.penetration	= p;
+			void AddContactPoint(Vector3 position, Vector3 normal, float p) {
+				point.position = position;
+				point.normal = normal;
+				point.penetration = p;
 			}
 
 			//Advanced collision detection / resolution
@@ -59,6 +58,7 @@ namespace NCL {
 		//Raycasting functions! We make these in tutorial 1
 
 		static Ray BuildRayFromMouse(const Camera& c);
+		static Ray BuildRayToCamera(const Camera& c, GameObject& object);
 		static bool RayIntersection(const Ray&r, GameObject& object, RayCollision &collisions);
 		static bool RayBoxIntersection(const Ray&r, const Vector3& boxPos, const Vector3& boxSize, RayCollision& collision);
 		static bool RayAABBIntersection(const Ray&r, const Transform& worldTransform, const AABBVolume&	volume, RayCollision& collision);

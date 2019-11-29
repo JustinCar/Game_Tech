@@ -19,6 +19,8 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 
+	goose = nullptr;
+
 	Debug::SetRenderer(renderer);
 
 	InitialiseAssets();
@@ -66,12 +68,12 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	if (!inSelectionMode) {
+	/*if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 	if (lockedObject != nullptr) {
 		LockedCameraMovement();
-	}
+	}*/
 
 	UpdateKeys();
 
@@ -84,6 +86,9 @@ void TutorialGame::UpdateGame(float dt) {
 
 	SelectObject();
 	MoveSelectedObject();
+	//SeenObjects();
+
+	goose->UpdatePlayer(dt);
 
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
@@ -179,7 +184,6 @@ void  TutorialGame::LockedCameraMovement() {
 		world->GetMainCamera()->SetYaw(angles.y);
 	}
 }
-
 
 void TutorialGame::DebugObjectMovement() {
 //If we've selected an object, we can manipulate it with some key presses
@@ -277,6 +281,32 @@ bool TutorialGame::SelectObject() {
 	return false;
 }
 
+void TutorialGame::SeenObjects() {
+	
+
+	GameObjectIterator first;
+	GameObjectIterator last;
+	world->GetObjectIterators(first, last);
+
+	for (vector<GameObject*>::const_iterator i = first;
+			i != last; i++) {
+	
+		Ray ray = CollisionDetection::BuildRayToCamera(*world->GetMainCamera(), **i);
+
+		GameObject* obj = *i;
+
+		RayCollision closestCollision;
+		if (!world->Raycast(ray, closestCollision, true)) {
+
+			obj->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
+		}
+		else 
+		{
+			obj->GetRenderObject()->SetColour(Vector4(0, 0, 0, 1));
+		}
+	}
+}
+
 /*
 If an object has been clicked, it can be pushed with the right mouse button, by an amount
 determined by the scroll wheel. In the first tutorial this won't do anything, as we haven't
@@ -285,7 +315,31 @@ line - after the third, they'll be able to twist under torque aswell.
 */
 
 void TutorialGame::MoveSelectedObject() {
+	renderer -> DrawString(" Click Force :" + std::to_string(forceMagnitude),
+		Vector2(10, 20)); // Draw debug text at 10 ,20
+	forceMagnitude += Window::GetMouse() -> GetWheelMovement() * 100.0f;
+	
+	if (!selectionObject) {
+		return;// we haven ’t selected anything !
 
+	}
+	// Push the selected object !
+	if (Window::GetMouse() -> ButtonPressed(NCL::MouseButtons::RIGHT)) {
+		Ray ray = CollisionDetection::BuildRayFromMouse(
+			* world -> GetMainCamera());
+		
+		RayCollision closestCollision;
+		if (world -> Raycast(ray, closestCollision, true)) {
+			if (closestCollision.node == selectionObject) {
+				selectionObject -> GetPhysicsObject() -> AddForceAtPosition(
+					ray.GetDirection() * forceMagnitude,
+					closestCollision.collidedAt);
+				
+			}
+
+		}
+
+	}
 }
 
 void TutorialGame::InitCamera() {
@@ -302,11 +356,13 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	InitMixedGridWorld(10, 10, 3.5f, 3.5f);
-	AddGooseToWorld(Vector3(30, 2, 0));
-	AddAppleToWorld(Vector3(35, 2, 0));
+	AddGooseToWorld(Vector3(50, 10, 0));
+	AddAppleToWorld(Vector3(55, 10, 0));
 
-	AddParkKeeperToWorld(Vector3(40, 2, 0));
-	AddCharacterToWorld(Vector3(45, 2, 0));
+	AddParkKeeperToWorld(Vector3(60, 10, 0));
+	AddCharacterToWorld(Vector3(65, 10, 0));
+
+	BridgeConstraintTest();
 
 	AddFloorToWorld(Vector3(0, -2, 0));
 }
@@ -319,7 +375,7 @@ A single function to add a large immoveable cube to the bottom of our world
 
 */
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject();
+	GameObject* floor = new GameObject("FLOOR");
 
 	Vector3 floorSize = Vector3(100, 2, 100);
 	AABBVolume* volume = new AABBVolume(floorSize);
@@ -346,7 +402,7 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 
 */
 GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass) {
-	GameObject* sphere = new GameObject();
+	GameObject* sphere = new GameObject("SPHERE");
 
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
@@ -366,9 +422,11 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 }
 
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
-	GameObject* cube = new GameObject();
+	GameObject* cube = new GameObject("CUBE");
 
 	AABBVolume* volume = new AABBVolume(dimensions);
+
+	//SphereVolume* volume = new SphereVolume(dimensions.x);
 
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -391,8 +449,9 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	float size			= 1.0f;
 	float inverseMass	= 1.0f;
 
-	GameObject* goose = new GameObject();
+	goose = new Player();
 
+	goose->setCamera(world->GetMainCamera());
 
 	SphereVolume* volume = new SphereVolume(size);
 	goose->SetBoundingVolume((CollisionVolume*)volume);
@@ -416,7 +475,7 @@ GameObject* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	float meshSize = 4.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* keeper = new GameObject();
+	GameObject* keeper = new GameObject("KEEPER");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);
@@ -449,7 +508,7 @@ GameObject* TutorialGame::AddCharacterToWorld(const Vector3& position) {
 		minVal.y = min(minVal.y, i.y);
 	}
 
-	GameObject* character = new GameObject();
+	GameObject* character = new GameObject("CHARACTER");
 
 	float r = rand() / (float)RAND_MAX;
 
@@ -472,7 +531,7 @@ GameObject* TutorialGame::AddCharacterToWorld(const Vector3& position) {
 }
 
 GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
-	GameObject* apple = new GameObject();
+	GameObject* apple = new GameObject("APPLE");
 
 	SphereVolume* volume = new SphereVolume(0.7f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);
@@ -497,7 +556,7 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 			AddSphereToWorld(position, radius, 1.0f);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -516,7 +575,7 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 			}
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 
 void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims) {
@@ -526,7 +585,7 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 			AddCubeToWorld(position, cubeDims, 1.0f);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -537,7 +596,7 @@ void TutorialGame::BridgeConstraintTest() {
 	float	maxDistance	= 30;
 	float	cubeDistance = 20;
 
-	Vector3 startPos = Vector3(500, 1000, 500);
+	Vector3 startPos = Vector3(0, 0, 500);
 
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
 

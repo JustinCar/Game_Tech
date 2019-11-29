@@ -1,7 +1,7 @@
 #pragma once
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
-
+#include "Player.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -32,6 +32,7 @@ namespace NCL {
 			void SimpleGJKTest();
 
 			bool SelectObject();
+			void SeenObjects();
 			void MoveSelectedObject();
 			void DebugObjectMovement();
 			void LockedObjectMovement();
@@ -46,6 +47,7 @@ namespace NCL {
 			GameObject* AddCharacterToWorld(const Vector3& position);
 			GameObject* AddAppleToWorld(const Vector3& position);
 
+			Player* goose;
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
