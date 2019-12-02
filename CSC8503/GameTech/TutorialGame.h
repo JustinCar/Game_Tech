@@ -2,6 +2,7 @@
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "Player.h"
+#include <stdlib.h>
 
 namespace NCL {
 	namespace CSC8503 {
@@ -28,7 +29,6 @@ namespace NCL {
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
-			void BridgeConstraintTest();
 			void SimpleGJKTest();
 
 			bool SelectObject();
@@ -39,6 +39,11 @@ namespace NCL {
 			void LockedCameraMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
+
+			GameObject* AddTerrainToWorld(const Vector3& position, const Vector3& size, const Vector4& colour);
+
+			void AddBridgeToWorld(Vector3 startPos);
+
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			//IT'S HAPPENING

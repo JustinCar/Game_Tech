@@ -32,7 +32,8 @@ void TestPathfinding() {
 	
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos)) {
-		testNodes.push_back(pos);	}
+		testNodes.push_back(pos);
+	}
 }
 
 void DisplayPathfinding() {
@@ -40,7 +41,9 @@ void DisplayPathfinding() {
 		Vector3 a = testNodes[i - 1];
 		Vector3 b = testNodes[i];
 		
-		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));	}
+		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
+	}
+
 }
 
 void TestStateMachine() {

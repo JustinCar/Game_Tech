@@ -68,12 +68,12 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	/*if (!inSelectionMode) {
+	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 	if (lockedObject != nullptr) {
 		LockedCameraMovement();
-	}*/
+	}
 
 	UpdateKeys();
 
@@ -88,7 +88,9 @@ void TutorialGame::UpdateGame(float dt) {
 	MoveSelectedObject();
 	//SeenObjects();
 
-	goose->UpdatePlayer(dt);
+	if (goose) 
+		goose->UpdatePlayer(dt);
+	
 
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
@@ -356,15 +358,57 @@ void TutorialGame::InitWorld() {
 	physics->Clear();
 
 	InitMixedGridWorld(10, 10, 3.5f, 3.5f);
-	AddGooseToWorld(Vector3(50, 10, 0));
+	//AddGooseToWorld(Vector3(50, 10, 0));
 	AddAppleToWorld(Vector3(55, 10, 0));
 
 	AddParkKeeperToWorld(Vector3(60, 10, 0));
 	AddCharacterToWorld(Vector3(65, 10, 0));
 
-	BridgeConstraintTest();
+	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
+	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
 
-	AddFloorToWorld(Vector3(0, -2, 0));
+	AddBridgeToWorld(westBridgeStartPos);
+	AddBridgeToWorld(eastBridgeStartPos);
+
+	Vector4 green = Vector4(0, 0.6, 0, 1);
+	Vector4 blue = Vector4(0, 0, 1, 1);
+	Vector4 grey = Vector4(0.41, 0.41, 0.41, 1);
+	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
+
+	/*for (int i = 0; i < 50; i++) 
+	{
+		int xPos = rand() % 480-220;
+		int zPos = rand() % 420-195;
+
+		int xScale;
+		int zScale;
+
+		if (rand() % 2 == 1)
+		{
+			xScale = 2;
+			zScale = rand() % 20 + 7;
+		}
+		else 
+		{
+			xScale = rand() % 20 + 7;
+			zScale = 2;
+		}
+		
+		AddTerrainToWorld(Vector3(xPos, 20, zPos), Vector3(xScale, 30, zScale), grey);
+	}*/
+
+	AddTerrainToWorld(Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
+	AddTerrainToWorld(Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
+	AddTerrainToWorld(Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
+	AddTerrainToWorld(Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
+
+	AddTerrainToWorld(Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
+	AddTerrainToWorld(Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
+	AddTerrainToWorld(Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
+	AddTerrainToWorld(Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
+
+	AddTerrainToWorld(Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
+	AddTerrainToWorld(Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
 }
 
 //From here on it's functions to add in objects to the world!
@@ -377,14 +421,16 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject("FLOOR");
 
-	Vector3 floorSize = Vector3(100, 2, 100);
+	Vector3 floorSize = Vector3(300, 2, 300);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform().SetWorldScale(floorSize);
 	floor->GetTransform().SetWorldPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, nullptr, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetRenderObject()->SetColour(Vector4(0, 0.6, 0, 1));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
@@ -393,6 +439,62 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	return floor;
 }
+
+GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, const Vector3& size, const Vector4& colour) {
+	GameObject* floor = new GameObject("FLOOR");
+
+	AABBVolume* volume = new AABBVolume(size);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform().SetWorldScale(size);
+	floor->GetTransform().SetWorldPosition(position);
+
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, nullptr, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetRenderObject()->SetColour(colour);
+
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(floor);
+
+	return floor;
+}
+
+void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
+	Vector3 cubeSize = Vector3(1, 1, 10);
+
+	float	invCubeMass = 0.5;
+	int		numLinks = 26;
+	float	maxDistance = 2;
+	float	cubeDistance = 2;
+
+	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
+
+	//Vector3 startPos = Vector3(36, 7, 15);
+
+	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
+
+	start->GetRenderObject()->SetColour(brown);
+
+	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
+
+	end->GetRenderObject()->SetColour(brown);
+
+	GameObject* previous = start;
+
+	for (int i = 0; i < numLinks; ++i) {
+		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
+		block->GetRenderObject()->SetColour(brown);
+		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
+		world->AddConstraint(constraint);
+		previous = block;
+	}
+
+	PositionConstraint* constraint = new PositionConstraint(previous, end, maxDistance);
+	world->AddConstraint(constraint);
+}
+
 
 /*
 
@@ -586,33 +688,6 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 		}
 	}
 	//AddFloorToWorld(Vector3(0, -2, 0));
-}
-
-void TutorialGame::BridgeConstraintTest() {
-	Vector3 cubeSize = Vector3(8, 8, 8);
-
-	float	invCubeMass = 5;
-	int		numLinks	= 25;
-	float	maxDistance	= 30;
-	float	cubeDistance = 20;
-
-	Vector3 startPos = Vector3(0, 0, 500);
-
-	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
-
-	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
-
-	GameObject* previous = start;
-
-	for (int i = 0; i < numLinks; ++i) {
-		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
-		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
-		world->AddConstraint(constraint);
-		previous = block;
-	}
-
-	PositionConstraint* constraint = new PositionConstraint(previous, end, maxDistance);
-	world->AddConstraint(constraint);
 }
 
 void TutorialGame::SimpleGJKTest() {

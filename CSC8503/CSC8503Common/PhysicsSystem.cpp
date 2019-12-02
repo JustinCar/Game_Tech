@@ -186,7 +186,8 @@ void PhysicsSystem::BasicCollisionDetection() {
 			}
 	
 		}
-	}
+
+	}
 }
 
 /*
@@ -209,7 +210,8 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 		(p.normal * p.penetration * (physA -> GetInverseMass() / totalMass)));
 	
 	transformB.SetWorldPosition(transformB.GetWorldPosition() +
-		(p.normal * p.penetration * (physB -> GetInverseMass() / totalMass)));	Vector3 relativeA = p.position - transformA.GetWorldPosition();
+		(p.normal * p.penetration * (physB -> GetInverseMass() / totalMass)));
+	Vector3 relativeA = p.position - transformA.GetWorldPosition();
 	Vector3 relativeB = p.position - transformB.GetWorldPosition();
 	
 	Vector3 angVelocityA =
@@ -218,7 +220,9 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	Vector3::Cross(physB -> GetAngularVelocity(), relativeB);
 	
 	Vector3 fullVelocityA = physA -> GetLinearVelocity() + angVelocityA;
-	Vector3 fullVelocityB = physB -> GetLinearVelocity() + angVelocityB;	Vector3 contactVelocity = fullVelocityB - fullVelocityA;
+	Vector3 fullVelocityB = physB -> GetLinearVelocity() + angVelocityB;
+	Vector3 contactVelocity = fullVelocityB - fullVelocityA;
+
 	float impulseForce = Vector3::Dot(contactVelocity, p.normal);
 	
 	// now to work out the effect of inertia ....
@@ -233,11 +237,13 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	float j = (-(1.0f + cRestitution) * impulseForce) /
 		(totalMass + angularEffect);
 	
-	Vector3 fullImpulse = p.normal * j;	physA -> ApplyLinearImpulse(-fullImpulse);
+	Vector3 fullImpulse = p.normal * j;
+	physA -> ApplyLinearImpulse(-fullImpulse);
 	physB -> ApplyLinearImpulse(fullImpulse);
 	
 	physA -> ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
-	physB -> ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
+	physB -> ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
+
 }
 
 /*
@@ -262,22 +268,25 @@ void PhysicsSystem::BroadPhase() {
 			continue;
 			
 		}
-		 Vector3 pos = (*i) -> GetConstTransform().GetWorldPosition();
+		Vector3 pos = (*i) -> GetConstTransform().GetWorldPosition();
 		tree.Insert(*i, pos, halfSizes);
-			}	tree.OperateOnContents([&](std::list < QuadTreeEntry < GameObject* > >& data) {
+	}
+	tree.OperateOnContents([&](std::list < QuadTreeEntry < GameObject* > >& data) {
 		CollisionDetection::CollisionInfo info;
 		
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				// is this pair of items already in the collision set -
 					// if the same pair is in another quadtree node together etc
+					
 					info.a = min((*i).object, (*j).object);
-				info.b = max((*i).object, (*j).object);				broadphaseCollisions.insert(info);
-				
+					info.b = max((*i).object, (*j).object);
+					broadphaseCollisions.insert(info);
 			}
 			
 		}
-	});
+	});
+
 }
 
 /*
@@ -290,12 +299,19 @@ void PhysicsSystem::NarrowPhase() {
 		i = broadphaseCollisions.begin();
 		i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
+
+		if (info.a->GetName() == "FLOOR" && info.b->GetName() == "FLOOR")
+		{
+			continue;
+		}
+
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
 			allCollisions.insert(info); // insert into our main set
 			
-		}	}
+		}
+	}
 }
 
 /*
@@ -342,7 +358,9 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 
 		angVel += angAccel * dt; // integrate angular accel !
 		object->SetAngularVelocity(angVel);
-	}
+
+	}
+
 }
 /*
 This function integrates linear and angular velocity into
@@ -371,7 +389,8 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 		transform.SetLocalPosition(position);
 		// Linear Damping
 		linearVel = linearVel * frameDamping;
-		object -> SetLinearVelocity(linearVel);
+		object -> SetLinearVelocity(linearVel);
+
 		// Orientation Stuff
 		Quaternion orientation = transform.GetLocalOrientation();
 		Vector3 angVel = object -> GetAngularVelocity();
@@ -384,7 +403,10 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 		
 		// Damp the angular velocity too
 		angVel = angVel * frameDamping;
-		object -> SetAngularVelocity(angVel);	}
+		object -> SetAngularVelocity(angVel);
+
+	}
+
 }
 
 /*
