@@ -27,13 +27,6 @@ void Player::UpdateCamera(float dt)
 {
 	Vector3 pos = transform.GetWorldPosition();
 
-	/*float t = transform.GetWorldOrientation().ToEuler().y;
-	t = sin((t * PI / 180) + 10);
-	pos.x -= t;
-	pos.z -= t;
-	pos.y = 10;
-	Vector3 camPos = pos;*/
-
 	Vector4 f = transform.GetWorldMatrix().GetColumn(2);
 
 	Vector3 forward = Vector3(f.x, f.y, f.z);
@@ -42,7 +35,6 @@ void Player::UpdateCamera(float dt)
 
 	camPos -= forward * 10;
 	camPos.y += 2;
-
 
 	Matrix4 temp = Matrix4::BuildViewMatrix(camPos, transform.GetWorldPosition(), Vector3(0, 1, 0));
 

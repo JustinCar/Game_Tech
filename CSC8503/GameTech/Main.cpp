@@ -21,12 +21,15 @@ void TestNetworking() {
 vector<Vector3> testNodes;
 
 void TestPathfinding() {
-	NavigationGrid grid("TestGrid1.txt");
+	NavigationGrid grid("TestGrid2.txt");
 	
 	NavigationPath outPath;
 	
-	Vector3 startPos(80, 0, 10);
-	Vector3 endPos(80, 0, 80);
+	Vector3 startPos(20, 0, 20);
+	Vector3 endPos(150, 0, 140);
+
+	/*Vector3 startPos(80, 0, 10);
+	Vector3 endPos(80, 0, 80);*/
 	
 	bool found = grid.FindPath(startPos, endPos, outPath);
 	
@@ -37,13 +40,18 @@ void TestPathfinding() {
 }
 
 void DisplayPathfinding() {
+	Vector3 offSet(-250, 10, -195);
 	for (int i = 1; i < testNodes.size(); ++i) {
 		Vector3 a = testNodes[i - 1];
+
+		a += offSet;
+
 		Vector3 b = testNodes[i];
+
+		b += offSet;
 		
 		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
 	}
-
 }
 
 void TestStateMachine() {

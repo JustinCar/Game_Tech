@@ -62,6 +62,12 @@ TutorialGame::~TutorialGame()	{
 	delete basicTex;
 	delete basicShader;
 
+	delete goose;
+	for (int i = 0; i < enemies.size(); i++) 
+	{
+		delete enemies[i];
+	}
+
 	delete physics;
 	delete renderer;
 	delete world;
@@ -90,6 +96,11 @@ void TutorialGame::UpdateGame(float dt) {
 
 	if (goose) 
 		goose->UpdatePlayer(dt);
+
+	for (int i = 0; i < 10; i++)
+	{
+		enemies[i]->UpdateEnemy(dt);
+	}
 	
 
 	world->UpdateWorld(dt);
@@ -251,6 +262,8 @@ bool TutorialGame::SelectObject() {
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				std::cout << "Position: " <<selectionObject->GetTransform().GetWorldPosition() << std::endl;
+				std::cout << "Size: " << selectionObject->GetTransform().GetLocalScale() << std::endl;
 				selectionObject = nullptr;
 			}
 
@@ -361,7 +374,13 @@ void TutorialGame::InitWorld() {
 	//AddGooseToWorld(Vector3(50, 10, 0));
 	AddAppleToWorld(Vector3(55, 10, 0));
 
-	AddParkKeeperToWorld(Vector3(60, 10, 0));
+	for (int i = 0; i < 10; i++) 
+	{
+		int xPos = rand() % 480 - 220;
+		int zPos = rand() % 420 - 195;
+		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
+	}
+
 	AddCharacterToWorld(Vector3(65, 10, 0));
 
 	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
@@ -385,27 +404,27 @@ void TutorialGame::InitWorld() {
 
 		if (rand() % 2 == 1)
 		{
-			xScale = 2;
+			xScale = 5;
 			zScale = rand() % 20 + 7;
 		}
 		else 
 		{
 			xScale = rand() % 20 + 7;
-			zScale = 2;
+			zScale = 5;
 		}
 		
 		AddTerrainToWorld(Vector3(xPos, 20, zPos), Vector3(xScale, 30, zScale), grey);
 	}*/
 
 	AddTerrainToWorld(Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
-	AddTerrainToWorld(Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
-	AddTerrainToWorld(Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
-	AddTerrainToWorld(Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
+	AddTerrainToWorld(Vector3(-140, -12, 15), Vector3(80, 20, 50), blue); // East floor
+	AddTerrainToWorld(Vector3(20, -12, -115), Vector3(240, 20, 80), grey); // South floor
+	AddTerrainToWorld(Vector3(20, -12, 145), Vector3(240, 20, 80), brown); // North floor
 
-	AddTerrainToWorld(Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
-	AddTerrainToWorld(Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
-	AddTerrainToWorld(Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
-	AddTerrainToWorld(Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
+	//AddTerrainToWorld(Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
+	//AddTerrainToWorld(Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
+	//AddTerrainToWorld(Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
+	//AddTerrainToWorld(Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
 
 	AddTerrainToWorld(Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
 	AddTerrainToWorld(Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
@@ -448,7 +467,7 @@ GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, const Vecto
 	floor->GetTransform().SetWorldScale(size);
 	floor->GetTransform().SetWorldPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, nullptr, basicShader));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetRenderObject()->SetColour(colour);
@@ -572,12 +591,13 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	return goose;
 }
 
-GameObject* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
+Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 {
 	float meshSize = 4.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* keeper = new GameObject("KEEPER");
+	Enemy* keeper = new Enemy();
+
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);

@@ -104,7 +104,8 @@ bool NavigationGrid::FindPath(const Vector3& from, const Vector3& to, Navigation
 	startNode -> g = 0;
 	startNode -> parent = nullptr;
 	
-	GridNode * currentBestNode = nullptr;	while (!openList.empty()) {
+	GridNode* currentBestNode = nullptr;
+	while (!openList.empty()) {
 		currentBestNode = RemoveBestNode(openList);
 		
 		if (currentBestNode == endNode) {// we ’ve found the path !
@@ -151,7 +152,8 @@ bool NavigationGrid::FindPath(const Vector3& from, const Vector3& to, Navigation
 bool NavigationGrid::NodeInList(GridNode* n, std::vector<GridNode*>& list) const {
 	std::vector < GridNode* >::iterator i =
 		std::find(list.begin(), list.end(), n);
-	return i == list.end() ? false : true;
+	return i == list.end() ? false : true;
+
 }
 
 GridNode*  NavigationGrid::RemoveBestNode(std::vector<GridNode*>& list) const {

@@ -42,6 +42,10 @@ namespace NCL {
 				return temp;
 			}
 
+			static float Distance(Vector3 a, Vector3 b) {
+				return sqrt(pow(b.x - a.x, 2) + pow(b.z - a.z, 2));
+			}
+
 			void			Normalise() {
 				float length = Length();
 
