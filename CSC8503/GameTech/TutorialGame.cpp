@@ -97,7 +97,7 @@ void TutorialGame::UpdateGame(float dt) {
 	if (goose) 
 		goose->UpdatePlayer(dt);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < enemies.size(); i++)
 	{
 		enemies[i]->UpdateEnemy(dt);
 	}
@@ -374,11 +374,11 @@ void TutorialGame::InitWorld() {
 	//AddGooseToWorld(Vector3(50, 10, 0));
 	AddAppleToWorld(Vector3(55, 10, 0));
 
-	for (int i = 0; i < 10; i++) 
+	for (int i = 0; i < 1; i++) 
 	{
 		int xPos = rand() % 480 - 220;
 		int zPos = rand() % 420 - 195;
-		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
+		enemies.push_back(AddParkKeeperToWorld(Vector3(140, 12, 70)));
 	}
 
 	AddCharacterToWorld(Vector3(65, 10, 0));

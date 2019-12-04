@@ -36,11 +36,13 @@ void TestPathfinding() {
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos)) {
 		testNodes.push_back(pos);
+		int i = 0;
 	}
 }
 
 void DisplayPathfinding() {
 	Vector3 offSet(-250, 10, -195);
+	//Vector3 offSet(0, 40, 0);
 	for (int i = 1; i < testNodes.size(); ++i) {
 		Vector3 a = testNodes[i - 1];
 

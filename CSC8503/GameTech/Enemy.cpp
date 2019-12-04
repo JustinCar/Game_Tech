@@ -4,8 +4,10 @@ using namespace CSC8503;
 
 Enemy::Enemy() : GameObject("ENEMY")
 {
-	speed = 20;
-	grid = NavigationGrid("TestGrid2.txt");
+	speed = 80;
+	//grid = NavigationGrid("TestGrid2.txt");
+
+	grid = new NavigationGrid("TestGrid2.txt");
 	pathfindingOffSet = Vector3(-250, 10, -195);
 	index = 0;
 	currentDirection = Vector3(0, 0, 0);
@@ -25,25 +27,29 @@ void Enemy::UpdateEnemy(float dt)
 		if (pathNodes.size() == 0)
 			return;
 	}
-		
 
-	Vector3 dir = transform.GetWorldPosition() - pathNodes[index];
+	DisplayPathfinding();
+
+	Vector3 node = pathNodes[index];
+
+	node += pathfindingOffSet;
+		
+	Vector3 dir = node - transform.GetWorldPosition();
 	dir.Normalise();
 
 	physicsObject->AddForce(dir * speed);
 
-	if (Vector3::Distance(transform.GetWorldPosition(), pathNodes[index]) <= 1)
+	if (Vector3::Distance(transform.GetWorldPosition(), node) <= 1)
 	{
 		index++;
 
 		if (index >= pathNodes.size())
 		{
+			pathNodes.clear();
 			index = 0;
 			GeneratePath();
 		}
-			
 	}
-		
 }
 
 void Enemy::GeneratePath() 
@@ -55,11 +61,17 @@ void Enemy::GeneratePath()
 	if (position == Vector3(0, 0, 0))
 		return;
 
-	position -= pathfindingOffSet;
-
 	position.x = roundToNearestTen(position.x);
 	position.z = roundToNearestTen(position.z);
 	position.y = 0;
+
+	Vector3 newPos = position;
+	newPos.y += 30;
+
+	Debug::DrawLine(position, newPos, Vector4(0, 0, 1, 1));
+
+	position -= pathfindingOffSet;
+	
 	// round position to nearest ten;
 
 	int randX = rand() % 23 + 1;
@@ -69,10 +81,17 @@ void Enemy::GeneratePath()
 	randZ *= 10;
 	Vector3 endPos(randX, 0, randZ);
 
-	bool found = grid.FindPath(position, endPos, outPath);
+	Vector3 newEndPos = endPos;
+	newEndPos.y += 30;
 
-	/*int i = 0;
-	while (!found) 
+	bool found = grid->FindPath(position, endPos, outPath);
+
+	if (!found) 
+	{
+		int i = 0;
+	}
+	
+	/*while (!found) 
 	{
 		int randX = rand() % 23 + 1;
 		randX *= 10;
@@ -81,28 +100,29 @@ void Enemy::GeneratePath()
 		randZ *= 10;
 		Vector3 endPos(randX, 0, randZ);
 
-		found = grid.FindPath(position, endPos, outPath);
+		found = grid->FindPath(position, endPos, outPath);
 	}*/
 
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos)) {
 		pathNodes.push_back(pos);
+		int i = 0;
 	}
 }
 
-//void Enemy::DisplayPathfinding() {
-//	for (int i = 1; i < pathNodes.size(); ++i) {
-//		Vector3 a = pathNodes[i - 1];
-//
-//		a += pathfindingOffSet;
-//
-//		Vector3 b = pathNodes[i];
-//
-//		b += pathfindingOffSet;
-//
-//		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
-//	}
-//}
+void Enemy::DisplayPathfinding() {
+	for (int i = 1; i < pathNodes.size(); ++i) {
+		Vector3 a = pathNodes[i - 1];
+
+		a += pathfindingOffSet;
+
+		Vector3 b = pathNodes[i];
+
+		b += pathfindingOffSet;
+
+		Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
+	}
+}
 
 int Enemy::roundToNearestTen(int num)
 {

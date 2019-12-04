@@ -1,5 +1,6 @@
 #pragma once
 #include "..\CSC8503Common\GameObject.h"
+#include "..\CSC8503Common\Debug.h"
 #include "../../Common/Window.h"
 #include "../../Common/Camera.h"
 #include "../CSC8503Common/NavigationGrid.h"
@@ -19,12 +20,12 @@ namespace NCL {
 		protected:
 			void GeneratePath();
 			int roundToNearestTen(int num);
-			//void DisplayPathfinding();
+			void DisplayPathfinding();
 
 			float speed; 
 			vector<Vector3> pathNodes;
 			int index;
-			NavigationGrid grid;
+			NavigationGrid* grid;
 			Vector3 pathfindingOffSet;
 			Vector3 currentDirection;
 		};
