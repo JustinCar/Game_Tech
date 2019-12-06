@@ -131,6 +131,40 @@ Quaternion Quaternion::Slerp(const Quaternion &from, const Quaternion &to, float
 	return (from * (cos(by))) + (to * (1.0f - cos(by)));
 }
 
+// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
+Quaternion Quaternion::RotationBetweenVectors(Vector3 start, Vector3 dest)
+{
+	start.Normalise();
+	dest.Normalise();
+
+	float cosTheta = Vector3::Dot(start, dest);
+	Vector3 rotationAxis;
+
+	//if (cosTheta < -1 + 0.001f) {
+	//	// special case when vectors in opposite directions:
+	//	// there is no "ideal" rotation axis
+	//	// So guess one; any will do as long as it's perpendicular to start
+	//	rotationAxis = Vector3::Cross(Vector3(0.0f, 0.0f, 1.0f), start);
+	//	if (gtx::norm::length2(rotationAxis) < 0.01) // bad luck, they were parallel, try again!
+	//		rotationAxis = cross(vec3(1.0f, 0.0f, 0.0f), start);
+
+	//	rotationAxis = normalize(rotationAxis);
+	//	return gtx::quaternion::angleAxis(glm::radians(180.0f), rotationAxis);
+	//}
+
+	rotationAxis = Vector3::Cross(start, dest);
+
+	float s = sqrt((1 + cosTheta) * 2);
+	float invs = 1 / s;
+
+	return Quaternion(
+		s * 0.5f,
+		rotationAxis.x * invs,
+		rotationAxis.y * invs,
+		rotationAxis.z * invs
+	);
+}
+
 //http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 //Verified! Different values to above, due to difference between x/z being 'forward'
 Vector3 Quaternion::ToEuler() const {
@@ -193,18 +227,18 @@ Quaternion Quaternion::AxisAngleToQuaterion(const Vector3& vector, float degrees
 }
 
 
-//Vector3	Quaternion::operator *(const Vector3 &a)	const {
-//	Vector3 uv, uuv;
-//	Vector3 qvec(x, y, z);
-//	uv = -Vector3::Cross(a, qvec);
-//	uuv = -Vector3::Cross(qvec, uv);
-//	uv *= (2.0f * w);
-//	uuv *= 2.0f;
-//
-//	return a + (uv + uuv);
-//}
+Vector3	Quaternion::operator *(const Vector3 &a)	const {
+	Vector3 uv, uuv;
+	Vector3 qvec(x, y, z);
+	uv = -Vector3::Cross(a, qvec);
+	uuv = -Vector3::Cross(qvec, uv);
+	uv *= (2.0f * w);
+	uuv *= 2.0f;
 
-Vector3	Quaternion::operator *(const Vector3& a)	const {
-	Quaternion newVec = *this * Quaternion(a.x, a.y, a.z, 0.0f) * Conjugate();
-	return Vector3(newVec.x, newVec.y, newVec.z);
+	return a + (uv + uuv);
 }
+
+//Vector3	Quaternion::operator *(const Vector3& a)	const {
+//	Quaternion newVec = *this * Quaternion(a.x, a.y, a.z, 0.0f) * Conjugate();
+//	return Vector3(newVec.x, newVec.y, newVec.z);
+//}

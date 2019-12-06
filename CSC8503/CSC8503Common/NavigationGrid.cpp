@@ -36,7 +36,7 @@ NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
 			char type = 0;
 			infile >> type;
 			n.type = type;
-			n.position = Vector3((float)(x * gridWidth), 0, (float)(y * gridHeight));
+			n.position = Vector3((float)(x * nodeSize), 0, (float)(y * nodeSize));
 		}
 	}
 	
@@ -73,6 +73,19 @@ NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
 
 NavigationGrid::~NavigationGrid()	{
 	delete[] allNodes;
+}
+
+bool NavigationGrid::ValidStartingPosition(Vector3 from)
+{
+	from /= 10;
+	int y = from.z;
+	int x = from.x;
+
+	GridNode& n = allNodes[(gridWidth * y) + x];
+	if (n.type == 'x')
+		return false;
+
+	return true;
 }
 
 bool NavigationGrid::FindPath(const Vector3& from, const Vector3& to, NavigationPath& outPath) {

@@ -1,15 +1,15 @@
 #pragma once
-
+#include "StateMachine.h"
 namespace NCL {
 	namespace CSC8503 {
 		class State		{
 		public:
 			State() {}
 			virtual ~State() {}
-			virtual void Update() = 0; //Pure virtual base class
+			virtual void Update(float dt) = 0; //Pure virtual base class
 		};
 
-		typedef void(*StateFunc)(void*);
+		typedef void(*StateFunc)(void*, float dt);
 
 		class GenericState : public State		{
 		public:
@@ -17,9 +17,9 @@ namespace NCL {
 				func		= someFunc;
 				funcData	= someData;
 			}
-			virtual void Update() {
+			virtual void Update(float dt) {
 				if (funcData != nullptr) {
-					func(funcData);
+					func(funcData, dt);
 				}
 			}
 		protected:

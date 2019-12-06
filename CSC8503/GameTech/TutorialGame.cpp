@@ -101,6 +101,27 @@ void TutorialGame::UpdateGame(float dt) {
 	{
 		enemies[i]->UpdateEnemy(dt);
 	}
+
+	Debug::DrawLine(Vector3(0, 0, 0), Vector3(0, 50, 0), Vector4(1, 0, 0, 1));
+	Debug::DrawLine(Vector3(480, 0, 0), Vector3(480, 50, 0), Vector4(1, 0, 0, 1));
+	Debug::DrawLine(Vector3(480, 0, 420), Vector3(480, 50, 420), Vector4(1, 0, 0, 1));
+	Debug::DrawLine(Vector3(0, 0, 420), Vector3(0, 50, 420), Vector4(1, 0, 0, 1));
+
+	/*for (int i = 0; i < 490; i += 10) 
+	{
+		for (int j = 0; j < 430; j += 10)
+		{
+			Vector3 v(i, 0, j);
+			Vector3 b(v);
+			b.y += 50;
+
+			if ((i >= 160 && i <= 320) &&
+				(j >= 160 && j <= 260))
+				continue;
+
+			Debug::DrawLine(v, b, Vector4(1, 0, 0, 1));
+		}
+	}*/
 	
 
 	world->UpdateWorld(dt);
@@ -370,24 +391,28 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitMixedGridWorld(10, 10, 3.5f, 3.5f);
-	//AddGooseToWorld(Vector3(50, 10, 0));
-	AddAppleToWorld(Vector3(55, 10, 0));
+	grid = NavigationGrid("TestGrid3.txt");
+
+	Vector3 offSet(220, 0, 195);
+
+	//InitMixedGridWorld(10, 10, 3.5f, 3.5f);
+	AddGooseToWorld(Vector3(50, 10, 0));
+	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
 	for (int i = 0; i < 1; i++) 
 	{
-		int xPos = rand() % 480 - 220;
-		int zPos = rand() % 420 - 195;
-		enemies.push_back(AddParkKeeperToWorld(Vector3(140, 12, 70)));
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
 	}
 
-	AddCharacterToWorld(Vector3(65, 10, 0));
+	AddCharacterToWorld(offSet + Vector3(65, 10, 0));
 
 	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
 	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
 
-	AddBridgeToWorld(westBridgeStartPos);
-	AddBridgeToWorld(eastBridgeStartPos);
+	AddBridgeToWorld(offSet + westBridgeStartPos);
+	AddBridgeToWorld(offSet + eastBridgeStartPos);
 
 	Vector4 green = Vector4(0, 0.6, 0, 1);
 	Vector4 blue = Vector4(0, 0, 1, 1);
@@ -416,21 +441,50 @@ void TutorialGame::InitWorld() {
 		AddTerrainToWorld(Vector3(xPos, 20, zPos), Vector3(xScale, 30, zScale), grey);
 	}*/
 
-	AddTerrainToWorld(Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
-	AddTerrainToWorld(Vector3(-140, -12, 15), Vector3(80, 20, 50), blue); // East floor
-	AddTerrainToWorld(Vector3(20, -12, -115), Vector3(240, 20, 80), grey); // South floor
-	AddTerrainToWorld(Vector3(20, -12, 145), Vector3(240, 20, 80), brown); // North floor
+	AddObstacles();
 
-	//AddTerrainToWorld(Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
-	//AddTerrainToWorld(Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
-	//AddTerrainToWorld(Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
-	//AddTerrainToWorld(Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
+	AddTerrainToWorld(offSet + Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
+	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), blue); // East floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), grey); // South floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), brown); // North floor
 
-	AddTerrainToWorld(Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
-	AddTerrainToWorld(Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
+	AddTerrainToWorld(offSet + Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
+	AddTerrainToWorld(offSet + Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
+	AddTerrainToWorld(offSet + Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
+	AddTerrainToWorld(offSet + Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
+
+	AddTerrainToWorld(offSet + Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
+	AddTerrainToWorld(offSet + Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
 }
 
 //From here on it's functions to add in objects to the world!
+
+void TutorialGame::AddObstacles()
+{
+	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
+
+	AddTerrainToWorld(Vector3(430, 18, 150), Vector3(55, 10, 5), brown);
+	AddTerrainToWorld(Vector3(380, 18, 165), Vector3(5, 10, 10), brown);
+	AddTerrainToWorld(Vector3(360, 18, 170), Vector3(15, 10, 5), brown);
+	AddTerrainToWorld(Vector3(430, 18, 180), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(Vector3(405, 18, 190), Vector3(30, 10, 5), brown);
+	AddTerrainToWorld(Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
+	AddTerrainToWorld(Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
+
+	Vector3 offset(-310, 0, 10);
+
+	AddTerrainToWorld(Vector3(20, 18, 140), Vector3(30, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(430, 18, 150), Vector3(55, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(380, 18, 165), Vector3(5, 10, 10), brown);
+	AddTerrainToWorld(offset + Vector3(360, 18, 170), Vector3(15, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(430, 18, 180), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(offset + Vector3(405, 18, 190), Vector3(30, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(offset + Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
+
+}
 
 /*
 
@@ -461,6 +515,9 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, const Vector3& size, const Vector4& colour) {
 	GameObject* floor = new GameObject("FLOOR");
+
+	floor->setLayer(1);
+	floor->setLayerMask(1);
 
 	AABBVolume* volume = new AABBVolume(size);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
@@ -596,14 +653,15 @@ Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	float meshSize = 4.0f;
 	float inverseMass = 0.5f;
 
-	Enemy* keeper = new Enemy();
+	Enemy* keeper = new Enemy(position);
+
+	keeper->setPlayer(goose);
 
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);
 
 	keeper->GetTransform().SetWorldScale(Vector3(meshSize, meshSize, meshSize));
-	keeper->GetTransform().SetWorldPosition(position);
 
 	keeper->SetRenderObject(new RenderObject(&keeper->GetTransform(), keeperMesh, nullptr, basicShader));
 	keeper->SetPhysicsObject(new PhysicsObject(&keeper->GetTransform(), keeper->GetBoundingVolume()));

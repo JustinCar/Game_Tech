@@ -27,6 +27,8 @@ namespace NCL {
 			void BroadPhase();
 			void NarrowPhase();
 
+			bool ShouldCollide(GameObject* a, GameObject* b); // Check layering
+
 			void ClearForces();
 
 			void IntegrateAccel(float dt);

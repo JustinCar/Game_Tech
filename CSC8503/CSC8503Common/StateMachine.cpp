@@ -17,16 +17,18 @@ StateMachine::~StateMachine()
 void StateMachine::AddState(State* s) {
 	allStates.emplace_back(s);
 	if (activeState == nullptr) {
-		activeState = s;	}
+		activeState = s;
+	}
+
 }
 
 void StateMachine::AddTransition(StateTransition* t) {
 	allTransitions.insert(std::make_pair(t -> GetSourceState(), t));
 }
 
-void StateMachine::Update() {
+void StateMachine::Update(float dt) {
 	if (activeState) {
-		activeState -> Update();
+		activeState -> Update(dt);
 		// Get the transition set starting from this state node ;
 		std::pair < TransitionIterator, TransitionIterator > range =
 			allTransitions.equal_range(activeState);

@@ -173,6 +173,9 @@ void PhysicsSystem::BasicCollisionDetection() {
 				continue;
 		
 			}
+
+
+
 			CollisionDetection::CollisionInfo info;
 
 			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
@@ -246,6 +249,20 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 
 }
 
+bool PhysicsSystem::ShouldCollide(GameObject* a, GameObject* b)
+{
+	if (!a->getLayer() || !b->getLayer())
+		return true;
+
+	if (a->getLayerMask() & (1 << (b->getLayer() - 1)))
+		return false;
+
+	if (b->getLayerMask() & (1 << (a->getLayer() - 1)))
+		return false;
+
+	return true;
+}
+
 /*
 
 Later, we replace the BasicCollisionDetection method with a broadphase
@@ -277,11 +294,14 @@ void PhysicsSystem::BroadPhase() {
 		for (auto i = data.begin(); i != data.end(); ++i) {
 			for (auto j = std::next(i); j != data.end(); ++j) {
 				// is this pair of items already in the collision set -
-					// if the same pair is in another quadtree node together etc
+				// if the same pair is in another quadtree node together etc
+
+				if (!ShouldCollide((*i).object, (*j).object))
+					continue;
 					
-					info.a = min((*i).object, (*j).object);
-					info.b = max((*i).object, (*j).object);
-					broadphaseCollisions.insert(info);
+				info.a = min((*i).object, (*j).object);
+				info.b = max((*i).object, (*j).object);
+				broadphaseCollisions.insert(info);
 			}
 			
 		}

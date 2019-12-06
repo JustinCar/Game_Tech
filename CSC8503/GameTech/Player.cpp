@@ -10,6 +10,9 @@ Player::Player() : GameObject("PLAYER")
 	yaw = 0.0f;
 	mainCamera = nullptr;
 	jumpPower = 100;
+
+	layer = 2;
+	layerMask = 0; // Collide with everything
 }
 
 Player::~Player() 
@@ -60,8 +63,6 @@ void Player::UpdateKeys(float dt)
 	}
 
 	transform.SetLocalOrientation(Quaternion::EulerAnglesToQuaternion(0, yaw, 0));
-
-	//mainCamera->SetYaw(yaw);
 
 	Vector4 z = transform.GetWorldMatrix().GetColumn(2);
 

@@ -21,12 +21,12 @@ void TestNetworking() {
 vector<Vector3> testNodes;
 
 void TestPathfinding() {
-	NavigationGrid grid("TestGrid2.txt");
+	NavigationGrid grid("TestGrid3.txt");
 	
 	NavigationPath outPath;
 	
 	Vector3 startPos(20, 0, 20);
-	Vector3 endPos(150, 0, 140);
+	Vector3 endPos(250, 0, 280);
 
 	/*Vector3 startPos(80, 0, 10);
 	Vector3 endPos(80, 0, 80);*/
@@ -41,7 +41,7 @@ void TestPathfinding() {
 }
 
 void DisplayPathfinding() {
-	Vector3 offSet(-250, 10, -195);
+	Vector3 offSet(5, 10, 5);
 	//Vector3 offSet(0, 40, 0);
 	for (int i = 1; i < testNodes.size(); ++i) {
 		Vector3 a = testNodes[i - 1];
@@ -56,46 +56,45 @@ void DisplayPathfinding() {
 	}
 }
 
-void TestStateMachine() {
-	StateMachine* testMachine = new StateMachine();
-
-	int someData = 0;
-
-	StateFunc AFunc = [](void* data) {
-		int* realData = (int*)data;
-		(*realData)++;
-		std::cout << "In State A!" << std::endl;
-	};
-	StateFunc BFunc = [](void* data) {
-		int* realData = (int*)data;
-		(*realData)--;
-		std::cout << "In State B!" << std::endl;
-	};
-
-	GenericState* stateA = new GenericState(AFunc, (void*)& someData);
-	GenericState* stateB = new GenericState(BFunc, (void*)& someData);
-	testMachine->AddState(stateA);
-	testMachine->AddState(stateB);
-
-	GenericTransition <int&, int >* transitionA =
-		new GenericTransition <int&, int >(
-			GenericTransition <int&, int >::GreaterThanTransition,
-			someData, 10, stateA, stateB); // if greater than 10 , A to B
-
-	GenericTransition <int&, int >* transitionB =
-		new GenericTransition <int&, int >(
-			GenericTransition <int&, int >::EqualsTransition,
-			someData, 0, stateB, stateA); // if equals 0 , B to A
-
-	testMachine->AddTransition(transitionA);
-	testMachine->AddTransition(transitionB);
-
-	for (int i = 0; i < 100; ++i) {
-		testMachine->Update(); // run the state machine !
-
-	}
-	delete testMachine;
-}
+//void TestStateMachine() {
+//	StateMachine* testMachine = new StateMachine();
+//
+//	int someData = 0;
+//
+//	StateFunc AFunc = [](void* data) {
+//		int* realData = (int*)data;
+//		(*realData)++;
+//		std::cout << "In State A!" << std::endl;
+//	};
+//	StateFunc BFunc = [](void* data) {
+//		int* realData = (int*)data;
+//		(*realData)--;
+//		std::cout << "In State B!" << std::endl;
+//	};
+//
+//	GenericState* stateA = new GenericState(AFunc, (void*)& someData);
+//	GenericState* stateB = new GenericState(BFunc, (void*)& someData);
+//	testMachine->AddState(stateA);
+//	testMachine->AddState(stateB);
+//
+//	GenericTransition <int&, int >* transitionA =
+//		new GenericTransition <int&, int >(
+//			GenericTransition <int&, int >::GreaterThanTransition,
+//			someData, 10, stateA, stateB); // if greater than 10 , A to B
+//
+//	GenericTransition <int&, int >* transitionB =
+//		new GenericTransition <int&, int >(
+//			GenericTransition <int&, int >::EqualsTransition,
+//			someData, 0, stateB, stateA); // if equals 0 , B to A
+//
+//	testMachine->AddTransition(transitionA);
+//	testMachine->AddTransition(transitionB);
+//
+//	for (int i = 0; i < 100; ++i) {
+//		testMachine->Update(1); // run the state machine !
+//	}
+//	delete testMachine;
+//}
 
 
 
@@ -127,10 +126,10 @@ int main() {
 
 	TutorialGame* g = new TutorialGame();
 
-	TestStateMachine();
+	//TestStateMachine();
 
-	TestPathfinding();
-	DisplayPathfinding();
+	//TestPathfinding();
+	//DisplayPathfinding();
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();

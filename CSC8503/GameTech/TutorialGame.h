@@ -41,6 +41,8 @@ namespace NCL {
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 
+			void AddObstacles();
+
 			GameObject* AddTerrainToWorld(const Vector3& position, const Vector3& size, const Vector4& colour);
 
 			void AddBridgeToWorld(Vector3 startPos);
@@ -49,7 +51,7 @@ namespace NCL {
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			//IT'S HAPPENING
 			GameObject* AddGooseToWorld(const Vector3& position);
-			Enemy* AddParkKeeperToWorld(const Vector3& position);
+			Enemy*		AddParkKeeperToWorld(const Vector3& position);
 			GameObject* AddCharacterToWorld(const Vector3& position);
 			GameObject* AddAppleToWorld(const Vector3& position);
 
@@ -71,6 +73,8 @@ namespace NCL {
 			OGLMesh*	sphereMesh	= nullptr;
 			OGLTexture* basicTex	= nullptr;
 			OGLShader*	basicShader = nullptr;
+
+			NavigationGrid grid;
 
 			//Coursework Meshes
 			OGLMesh*	gooseMesh	= nullptr;

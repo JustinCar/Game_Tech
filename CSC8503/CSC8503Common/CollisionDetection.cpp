@@ -141,7 +141,8 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 	collisionInfo.b = b;
 	
 	const Transform & transformA = a -> GetConstTransform();
-	const Transform & transformB = b -> GetConstTransform();	VolumeType pairType = (VolumeType)((int)volA -> type | (int)volB -> type);
+	const Transform & transformB = b -> GetConstTransform();
+	VolumeType pairType = (VolumeType)((int)volA -> type | (int)volB -> type);
 	
 	if (pairType == VolumeType::AABB) {
 		return AABBIntersection((AABBVolume&)* volA, transformA,
@@ -152,7 +153,9 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 	if (pairType == VolumeType::Sphere) {
 		return SphereIntersection((SphereVolume&)* volA, transformA,
 			(SphereVolume&)* volB, transformB, collisionInfo);
-	}	if (volA -> type == VolumeType::AABB &&
+
+	}
+	if (volA -> type == VolumeType::AABB &&
 		volB -> type == VolumeType::Sphere) {
 		return AABBSphereIntersection((AABBVolume&)* volA, transformA,
 			(SphereVolume&)* volB, transformB, collisionInfo);
@@ -178,7 +181,8 @@ bool CollisionDetection::AABBTest(const Vector3& posA, const Vector3& posB, cons
 		abs(delta.z) < totalSize.z) {
 		return true;
 	}
-	return false;
+	return false;
+
 }
 
 //AABB/AABB Collisions
@@ -197,7 +201,8 @@ bool CollisionDetection::AABBIntersection(const AABBVolume& volumeA, const Trans
 			Vector3(-1, 0, 0), Vector3(1, 0, 0),
 			Vector3(0, -1, 0), Vector3(0, 1, 0),
 			Vector3(0, 0, -1), Vector3(0, 0, 1),
-		};		Vector3 maxA = boxAPos + boxASize;
+		};
+		Vector3 maxA = boxAPos + boxASize;
 		Vector3 minA = boxAPos - boxASize;
 		
 		Vector3 maxB = boxBPos + boxBSize;
@@ -222,7 +227,8 @@ bool CollisionDetection::AABBIntersection(const AABBVolume& volumeA, const Trans
 				penetration = distances[i];
 				axis = faces[i];
 			}
-		}		Vector3 closestPointOnBoxA = Maths::Clamp(boxBPos, minA, maxA);
+		}
+		Vector3 closestPointOnBoxA = Maths::Clamp(boxBPos, minA, maxA);
 		Vector3 closestPointOnBoxB = Maths::Clamp(boxAPos, minB, maxB);
 		
 		Vector3 aDir = (boxAPos - closestPointOnBoxB).Normalised();
@@ -236,13 +242,16 @@ bool CollisionDetection::AABBIntersection(const AABBVolume& volumeA, const Trans
 				closestPointOnBoxB, axis, penetration);
 		}
 		else {
-			collisionInfo.AddContactPoint(			closestPointOnBoxA, axis, penetration);
+			collisionInfo.AddContactPoint(
+
+			closestPointOnBoxA, axis, penetration);
 
 		}
 		return true;
 
 	}
-	return false;}
+	return false;
+}
 
 //Sphere / Sphere Collision
 bool CollisionDetection::SphereIntersection(const SphereVolume& volumeA, const Transform& worldTransformA,
@@ -276,7 +285,8 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 	Vector3 delta = worldTransformB.GetWorldPosition() -
 	worldTransformA.GetWorldPosition();
 		
-	Vector3 closestPointOnBox = Maths::Clamp(delta, -boxSize, boxSize);	Vector3 localPoint = delta - closestPointOnBox;
+	Vector3 closestPointOnBox = Maths::Clamp(delta, -boxSize, boxSize);
+	Vector3 localPoint = delta - closestPointOnBox;
 	float distance = (localPoint).Length();
 		
 	if (distance < volumeB.GetRadius()) {// yes , we ’re colliding !
@@ -286,7 +296,9 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 			(volumeB.GetRadius() - distance)
 			);
 		return true;
-	}	return false;
+	}
+	return false;
+
 }
 
 bool CollisionDetection::OBBIntersection(

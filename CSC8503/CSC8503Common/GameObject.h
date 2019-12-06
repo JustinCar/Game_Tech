@@ -75,6 +75,12 @@ namespace NCL {
 
 			void UpdateBroadphaseAABB();
 
+			unsigned long getLayer() { return layer; };
+			unsigned long getLayerMask() { return layerMask; };
+
+			void setLayer(unsigned long l) { layer = l; };
+			void setLayerMask(unsigned long m) { layerMask = m; };
+
 		protected:
 			Transform			transform;
 
@@ -82,6 +88,9 @@ namespace NCL {
 			PhysicsObject*		physicsObject;
 			RenderObject*		renderObject;
 			NetworkObject*		networkObject;
+
+			unsigned long layer; // Bit number
+			unsigned long layerMask; // Set bit for each layer that this gameobject should not collide with
 
 			bool	isActive;
 			string	name;
