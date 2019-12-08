@@ -396,7 +396,7 @@ void TutorialGame::InitWorld() {
 	Vector3 offSet(220, 0, 195);
 
 	//InitMixedGridWorld(10, 10, 3.5f, 3.5f);
-	AddGooseToWorld(Vector3(50, 10, 0));
+	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
 	for (int i = 0; i < 1; i++) 

@@ -3,12 +3,12 @@
 #include "..\CSC8503Common\Debug.h"
 #include "../../Common/Window.h"
 #include "../../Common/Camera.h"
-//#include "../../Common/Maths.h"
 #include "../CSC8503Common/NavigationGrid.h"
 #include "../CSC8503Common/StateMachine.h"
 #include "../CSC8503Common/StateTransition.h"
 #include "../CSC8503Common/State.h"
 #include "EnemyPatrolSuperState.h"
+#include "EnemyChaseSuperState.h"
 #include <cmath>
 #define PI 3.14159265
 namespace NCL {
@@ -22,6 +22,8 @@ namespace NCL {
 			void UpdateEnemy(float dt);
 			void Patrol(float dt);
 			void Idle(float dt);
+			void Chase(float dt);
+			void Attack(float dt);
 
 			void setTimeSpentIdle(float t) { timeSpentIdle = t; };
 			float& getTimeSpentIdle() { return timeSpentIdle; };
@@ -31,6 +33,10 @@ namespace NCL {
 
 			float getTimeToSpendIdle() { return timeToSpendIdle; };
 			float getTimeToSpendPatrolling() { return timeToSpendPatrolling; };
+
+			float& getDistanceFromPlayer() { return distanceFromPlayer; };
+			float getChaseRadius() { return chaseRadius; };
+			float getAttackRadius() { return attackRadius; };
 
 			void setPlayer(GameObject* p) { player = p; };
 			
@@ -43,6 +49,7 @@ namespace NCL {
 			void InitStateMachine();
 
 			float speed; 
+			float chaseSpeed;
 			float rotationSpeed;
 
 			StateMachine* testMachine;
@@ -55,6 +62,7 @@ namespace NCL {
 
 			float distanceFromPlayer;
 			float chaseRadius;
+			float attackRadius;
 
 			GameObject* player;
 

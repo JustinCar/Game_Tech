@@ -26,5 +26,20 @@ namespace NCL {
 			StateFunc func;
 			void* funcData;
 		};
+
+		/*class EnemyState : public State {
+		public:
+			EnemyState(EnemyFunc someFunc, Enemy& someData) : funcData(someData) {
+				func = someFunc;
+			}
+
+			virtual void Update(float dt) {
+				func(funcData, dt);
+			}
+		protected:
+			EnemyFunc func;
+			Enemy& funcData;
+		};*/
+
 	}
 }

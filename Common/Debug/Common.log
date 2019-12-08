@@ -1,8 +1,1 @@
-﻿  Camera.cpp
-  RendererBase.cpp
-  Win32Keyboard.cpp
-  Win32Mouse.cpp
-  Win32Window.cpp
-  Window.cpp
-  Generating Code...
-  Common.vcxproj -> C:\Users\b6038386\Documents\GitHub\Game_Tech\Win32\Debug\Common.lib
+﻿  Common.vcxproj -> C:\Users\Justin\Documents\GameDev\Projects\Game_Tech\Win32\Debug\Common.lib

@@ -6,6 +6,7 @@ using namespace CSC8503;
 Enemy::Enemy(Vector3 position) : GameObject("ENEMY")
 {
 	speed = 80;
+	chaseSpeed = 200;
 	rotationSpeed = 5;
 	player = nullptr;
 	grid = new NavigationGrid("TestGrid3.txt");
@@ -25,14 +26,15 @@ Enemy::Enemy(Vector3 position) : GameObject("ENEMY")
 
 	transform.SetWorldPosition(position);
 
-	timeToSpendIdle = 5.0f;
+	timeToSpendIdle = 10.0f;
 	timeToSpendPatrolling = 10.0f;
 
 	timeSpentIdle = 0.0f;
 	timeSpentPatrolling = 0.0f;
 
 	distanceFromPlayer = 0.0f;
-	chaseRadius = 5.0f;
+	chaseRadius = 50.0f;
+	attackRadius = 15.0f;
 
 	pathfindingOffSet = Vector3(0, 10, 0);
 	index = 0;
@@ -59,31 +61,30 @@ void Enemy::InitStateMachine()
 	stateMachine = new StateMachine();
 
 	// Hierarchical State Machine
-	StateFunc PatrolSuperState = [](void* data, float dt) {
+	StateFunc patrol = [](void* data, float dt) {
 		EnemyPatrolSuperState* realData = (EnemyPatrolSuperState*)data;
 		realData->Update(dt);
-		std::cout << "PATROLLING!" << std::endl;
 	};
 
-	StateFunc ChaseSuperState = [](void* data, float dt) {
-		EnemyPatrolSuperState* realData = (EnemyPatrolSuperState*)data;
+	StateFunc chase = [](void* data, float dt) {
+		EnemyChaseSuperState* realData = (EnemyChaseSuperState*)data;
 		realData->Update(dt);
-		std::cout << "IDLE!" << std::endl;
 	};
 
-	EnemyPatrolSuperState* superState =  new EnemyPatrolSuperState(this);
+	EnemyPatrolSuperState* patrolSuperState =  new EnemyPatrolSuperState(*this);
+	EnemyChaseSuperState* chaseSuperState = new EnemyChaseSuperState(*this);
 
-	GenericState* stateA = new GenericState(PatrolSuperState, (void*) superState);
-	GenericState* stateB = new GenericState(ChaseSuperState, (void*) superState);
+	GenericState* stateA = new GenericState(patrol, (void*) patrolSuperState);
+	GenericState* stateB = new GenericState(chase, (void*) chaseSuperState);
 	stateMachine->AddState(stateA);
 	stateMachine->AddState(stateB);
 
-	GenericTransition <float&, float >* transitionA =
+	GenericTransition <float&, float>* transitionA =
 		new GenericTransition <float&, float >(
 			GenericTransition <float&, float >::LessThanTransition,
 			distanceFromPlayer, chaseRadius, stateA, stateB);
 
-	GenericTransition <float&, float >* transitionB =
+	GenericTransition <float&, float>* transitionB =
 		new GenericTransition <float&, float >(
 			GenericTransition <float&, float >::GreaterThanTransition,
 			distanceFromPlayer, chaseRadius, stateB, stateA);
@@ -92,8 +93,28 @@ void Enemy::InitStateMachine()
 	stateMachine->AddTransition(transitionB);
 }
 
+void Enemy::Chase(float dt)
+{
+	Vector3 dir = player->GetTransform().GetWorldPosition() - transform.GetWorldPosition();
+	dir.Normalise();
+
+	physicsObject->AddForce(dir * speed);
+}
+
+void Enemy::Attack(float dt)
+{
+	
+}
+
 void Enemy::Idle(float dt)
 {
+	if (pathNodes.size() > 0)
+	{
+		pathNodes.clear();
+		timeSpentPatrolling = 0;
+		index = 0;
+	}
+
 	timeSpentIdle += dt;
 }
 
@@ -104,11 +125,12 @@ void Enemy::Patrol(float dt)
 		GeneratePath();
 		if (pathNodes.size() == 0)
 			return;
+		timeSpentIdle = 0;
 	}
 
 	timeSpentPatrolling += dt;
 
-	//DisplayPathfinding();
+	DisplayPathfinding();
 
 	Vector3 node = pathNodes[index];
 
