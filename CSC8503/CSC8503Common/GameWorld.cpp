@@ -60,6 +60,10 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 void GameWorld::UpdateWorld(float dt) {
 	UpdateTransforms();
 
+	for (auto& i : gameObjects) {
+		i->Update(dt);
+	}
+
 	if (shuffleObjects) {
 		std::random_shuffle(gameObjects.begin(), gameObjects.end());
 	}
@@ -127,7 +131,7 @@ void GameWorld::AddConstraint(Constraint* c) {
 }
 
 void GameWorld::RemoveConstraint(Constraint* c) {
-	std::remove(constraints.begin(), constraints.end(), c);
+	constraints.erase(std::remove(constraints.begin(), constraints.end(), c), constraints.end());
 }
 
 void GameWorld::GetConstraintIterators(

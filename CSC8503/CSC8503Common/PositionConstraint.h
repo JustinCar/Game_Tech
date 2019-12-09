@@ -7,6 +7,7 @@ namespace NCL {
 
 		class PositionConstraint : public Constraint	{
 		public:
+			PositionConstraint();
 			PositionConstraint(GameObject* a, GameObject* b, float d);
 			~PositionConstraint();
 

@@ -10,6 +10,7 @@
 #include "EnemyPatrolSuperState.h"
 #include "EnemyChaseSuperState.h"
 #include <cmath>
+#include "Player.h"
 #define PI 3.14159265
 namespace NCL {
 	namespace CSC8503 {
@@ -17,9 +18,12 @@ namespace NCL {
 		class Enemy : public GameObject
 		{
 		public:
-			Enemy(Vector3 position);
+			Enemy(Vector3 position, GameWorld* world);
 			~Enemy();
-			void UpdateEnemy(float dt);
+			//void UpdateEnemy(float dt);
+			virtual void Update(float dt);
+			virtual void Trigger(GameObject& obj);
+
 			void Patrol(float dt);
 			void Idle(float dt);
 			void Chase(float dt);
@@ -48,6 +52,8 @@ namespace NCL {
 
 			void InitStateMachine();
 
+			GameWorld* gameWorld;
+
 			float speed; 
 			float chaseSpeed;
 			float rotationSpeed;
@@ -63,6 +69,7 @@ namespace NCL {
 			float distanceFromPlayer;
 			float chaseRadius;
 			float attackRadius;
+			bool attacked;
 
 			GameObject* player;
 

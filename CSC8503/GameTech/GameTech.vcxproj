@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Collectable.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyChaseSuperState.cpp" />
     <ClCompile Include="EnemyPatrolSuperState.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="TutorialGame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Collectable.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyChaseSuperState.h" />
     <ClInclude Include="EnemyPatrolSuperState.h" />

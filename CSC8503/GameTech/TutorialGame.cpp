@@ -11,15 +11,20 @@ using namespace NCL;
 using namespace CSC8503;
 
 TutorialGame::TutorialGame()	{
-	world		= new GameWorld();
-	renderer	= new GameTechRenderer(*world);
-	physics		= new PhysicsSystem(*world);
+	world = new GameWorld();
+	renderer = new GameTechRenderer(*world);
+	physics = new PhysicsSystem(*world);
 
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
 
 	goose = nullptr;
+
+	matchTimer = 3.0f;
+
+	playButtonSelected = true;
+	playing = false;
 
 	Debug::SetRenderer(renderer);
 
@@ -50,9 +55,6 @@ void TutorialGame::InitialiseAssets() {
 
 	basicTex	= (OGLTexture*)TextureLoader::LoadAPITexture("checkerboard.png");
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
-
-	InitCamera();
-	InitWorld();
 }
 
 TutorialGame::~TutorialGame()	{
@@ -73,13 +75,85 @@ TutorialGame::~TutorialGame()	{
 	delete world;
 }
 
+void TutorialGame::StartGame()
+{
+	InitCamera();
+	InitWorld();
+}
+
+void TutorialGame::RenderMenu()
+{
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN) && playButtonSelected) {
+		playButtonSelected = false;
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP) && !playButtonSelected) {
+		playButtonSelected = true;
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::RETURN)) {
+		if (playButtonSelected)
+		{
+			playing = true;
+			StartGame();
+		}	
+
+		if (!playButtonSelected)
+			exit(0);
+	}
+
+	if (playButtonSelected)
+	{
+		renderer->DrawString("Play",
+					Vector2(640, 600), Vector4(0, 0, 1, 1));
+
+		renderer->DrawString("Exit",
+			Vector2(640, 400));
+	} else 
+	{
+		renderer->DrawString("Play",
+			Vector2(640, 600));
+
+		renderer->DrawString("Exit",
+			Vector2(640, 400), Vector4(0, 0, 1, 1));
+	}
+		
+}
+
 void TutorialGame::UpdateGame(float dt) {
+
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
+
+	if (!playing)
+		RenderMenu();
+	else
+	{
+		matchTimer -= dt;
+
+		int seconds = matchTimer;
+		renderer->DrawString(std::to_string(seconds / 60) + "." + std::to_string(seconds % 60),
+			Vector2(640, 600), Vector4(0, 0, 1, 1));
+
+		// Gameover
+		if (matchTimer <= 0)
+		{
+			renderer->DrawString("!!GAMEOVER!!",
+				Vector2(640, 600), Vector4(0, 0, 1, 1));
+
+			playing = false;
+		}
+	}
+	
 	if (lockedObject != nullptr) {
 		LockedCameraMovement();
 	}
+
+	
+
+	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
+		Vector2(10, 20)); // Draw debug text at 10 ,20
 
 	UpdateKeys();
 
@@ -93,14 +167,6 @@ void TutorialGame::UpdateGame(float dt) {
 	SelectObject();
 	MoveSelectedObject();
 	//SeenObjects();
-
-	if (goose) 
-		goose->UpdatePlayer(dt);
-
-	for (int i = 0; i < enemies.size(); i++)
-	{
-		enemies[i]->UpdateEnemy(dt);
-	}
 
 	Debug::DrawLine(Vector3(0, 0, 0), Vector3(0, 50, 0), Vector4(1, 0, 0, 1));
 	Debug::DrawLine(Vector3(480, 0, 0), Vector3(480, 50, 0), Vector4(1, 0, 0, 1));
@@ -399,6 +465,20 @@ void TutorialGame::InitWorld() {
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
+	for (int i = 0; i < 30; i++)
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		AddAppleToWorld(Vector3(xPos, 10, zPos));
+	}
+
+	for (int i = 0; i < 20; i++)
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
+	}
+
 	for (int i = 0; i < 1; i++) 
 	{
 		int xPos = rand() % 480;
@@ -419,41 +499,22 @@ void TutorialGame::InitWorld() {
 	Vector4 grey = Vector4(0.41, 0.41, 0.41, 1);
 	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
 
-	/*for (int i = 0; i < 50; i++) 
-	{
-		int xPos = rand() % 480-220;
-		int zPos = rand() % 420-195;
-
-		int xScale;
-		int zScale;
-
-		if (rand() % 2 == 1)
-		{
-			xScale = 5;
-			zScale = rand() % 20 + 7;
-		}
-		else 
-		{
-			xScale = rand() % 20 + 7;
-			zScale = 5;
-		}
-		
-		AddTerrainToWorld(Vector3(xPos, 20, zPos), Vector3(xScale, 30, zScale), grey);
-	}*/
-
 	AddObstacles();
 
 	AddTerrainToWorld(offSet + Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
-	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), blue); // East floor
-	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), grey); // South floor
-	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), brown); // North floor
+	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
 
 	AddTerrainToWorld(offSet + Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
 	AddTerrainToWorld(offSet + Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
 	AddTerrainToWorld(offSet + Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
 	AddTerrainToWorld(offSet + Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
 
-	AddTerrainToWorld(offSet + Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
+	GameObject* island = AddTerrainToWorld(offSet + Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
+	island->setLayer(5);
+	island->setLayerMask(17);
+	
 	AddTerrainToWorld(offSet + Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
 }
 
@@ -483,7 +544,6 @@ void TutorialGame::AddObstacles()
 	AddTerrainToWorld(offset + Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
 	AddTerrainToWorld(offset + Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
 	AddTerrainToWorld(offset + Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
-
 }
 
 /*
@@ -653,7 +713,7 @@ Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	float meshSize = 4.0f;
 	float inverseMass = 0.5f;
 
-	Enemy* keeper = new Enemy(position);
+	Enemy* keeper = new Enemy(position, world);
 
 	keeper->setPlayer(goose);
 
@@ -711,7 +771,7 @@ GameObject* TutorialGame::AddCharacterToWorld(const Vector3& position) {
 }
 
 GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
-	GameObject* apple = new GameObject("APPLE");
+	Collectable* apple = new Collectable(10, position);
 
 	SphereVolume* volume = new SphereVolume(0.7f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);
@@ -721,12 +781,31 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), appleMesh, nullptr, basicShader));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
-	apple->GetPhysicsObject()->SetInverseMass(1.0f);
+	apple->GetPhysicsObject()->SetInverseMass(100.0f);
 	apple->GetPhysicsObject()->InitSphereInertia();
 
 	world->AddGameObject(apple);
 
 	return apple;
+}
+
+GameObject* TutorialGame::AddBonusItemToWorld(const Vector3& position) {
+	Collectable* box = new Collectable(20, position);
+
+	AABBVolume* volume = new AABBVolume(Vector3(0.15, 0.15, 0.15));
+	box->SetBoundingVolume((CollisionVolume*)volume);
+	box->GetTransform().SetWorldScale(Vector3(0.3, 0.3, 0.3));
+	box->GetTransform().SetWorldPosition(position);
+
+	box->SetRenderObject(new RenderObject(&box->GetTransform(), cubeMesh, nullptr, basicShader));
+	box->SetPhysicsObject(new PhysicsObject(&box->GetTransform(), box->GetBoundingVolume()));
+
+	box->GetPhysicsObject()->SetInverseMass(100.0f);
+	box->GetPhysicsObject()->InitSphereInertia();
+
+	world->AddGameObject(box);
+
+	return box;
 }
 
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {

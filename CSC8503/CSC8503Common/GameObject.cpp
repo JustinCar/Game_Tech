@@ -19,6 +19,16 @@ GameObject::~GameObject()	{
 	delete networkObject;
 }
 
+void GameObject::Update(float dt)
+{
+
+}
+
+void GameObject::Trigger(GameObject& obj)
+{
+
+}
+
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
 	if (!boundingVolume) {
 		return false;

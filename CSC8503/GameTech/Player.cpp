@@ -20,10 +20,15 @@ Player::~Player()
 
 }
 
-void Player::UpdatePlayer(float dt)
+void Player::Update(float dt)
 {
 	UpdateKeys(dt);
 	UpdateCamera(dt);
+}
+
+void Player::Trigger(GameObject& obj)
+{
+
 }
 
 void Player::UpdateCamera(float dt)

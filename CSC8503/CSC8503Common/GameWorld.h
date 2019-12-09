@@ -53,6 +53,8 @@ namespace NCL {
 				std::vector<Constraint*>::const_iterator& first,
 				std::vector<Constraint*>::const_iterator& last) const;
 
+			void increaseScore(int s) { score += s; };
+
 		protected:
 			void UpdateTransforms();
 			void UpdateQuadTree();
@@ -64,6 +66,8 @@ namespace NCL {
 			QuadTree<GameObject*>* quadTree;
 
 			Camera* mainCamera;
+
+			int score;
 
 			bool shuffleConstraints;
 			bool shuffleObjects;

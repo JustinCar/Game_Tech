@@ -19,6 +19,10 @@ namespace NCL {
 			GameObject(string name = "");
 			~GameObject();
 
+			virtual void Update(float dt);
+
+			virtual void Trigger(GameObject& obj);
+
 			void SetBoundingVolume(CollisionVolume* vol) {
 				boundingVolume = vol;
 			}

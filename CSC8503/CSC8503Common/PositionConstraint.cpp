@@ -7,6 +7,11 @@ using namespace NCL;
 using namespace NCL::Maths;
 using namespace CSC8503;
 
+PositionConstraint::PositionConstraint()
+{
+
+}
+
 PositionConstraint::PositionConstraint(GameObject* a, GameObject* b, float d)
 {
 	objectA		= a;

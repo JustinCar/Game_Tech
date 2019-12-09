@@ -1,6 +1,8 @@
 #pragma once
 #include "../CSC8503Common/GameWorld.h"
 #include <set>
+#include "../CSC8503Common/PositionConstraint.h"
+#include "../GameTech/Player.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -28,6 +30,9 @@ namespace NCL {
 			void NarrowPhase();
 
 			bool ShouldCollide(GameObject* a, GameObject* b); // Check layering
+			void HandleCollision(GameObject* a, GameObject* b);
+			void HandleCollectable(GameObject* player, GameObject* collectable);
+			void HandleScoreIncrease(GameObject* player);
 
 			void ClearForces();
 

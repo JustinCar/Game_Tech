@@ -7,13 +7,13 @@ EnemyChaseSuperState::EnemyChaseSuperState(Enemy& e) : enemy(e) {
 
 	Chase = [](Enemy& data, float dt) {
 		Enemy& obj = (Enemy&)data;
-		std::cout << "CHASING!" << std::endl;
+		//std::cout << "CHASING!" << std::endl;
 		obj.Chase(dt);
 	};
 
 	Attack = [](Enemy& data, float dt) {
 		Enemy& obj = (Enemy&)data;
-		std::cout << "ATTACKING!" << std::endl;
+		//std::cout << "ATTACKING!" << std::endl;
 		obj.Attack(dt);
 	};
 

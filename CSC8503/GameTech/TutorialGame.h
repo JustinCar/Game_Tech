@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "Enemy.h"
 #include <stdlib.h>
+#include "Collectable.h"
+#include <string> 
 
 namespace NCL {
 	namespace CSC8503 {
@@ -54,9 +56,17 @@ namespace NCL {
 			Enemy*		AddParkKeeperToWorld(const Vector3& position);
 			GameObject* AddCharacterToWorld(const Vector3& position);
 			GameObject* AddAppleToWorld(const Vector3& position);
+			GameObject* AddBonusItemToWorld(const Vector3& position);
 
 			Player* goose;
 			vector<Enemy*> enemies;
+
+			void RenderMenu();
+			bool playButtonSelected;
+			bool playing;
+			void StartGame();
+
+			float matchTimer;
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;

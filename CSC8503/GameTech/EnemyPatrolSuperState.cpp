@@ -7,13 +7,13 @@ EnemyPatrolSuperState::EnemyPatrolSuperState(Enemy& e) : enemy(e) {
 
 	Idle = [](Enemy& data, float dt) {
 		Enemy& obj = (Enemy&)data;
-		std::cout << "IDLE!" << std::endl;
+		//std::cout << "IDLE!" << std::endl;
 		obj.Idle(dt);
 	};
 
 	Patrol = [](Enemy& data, float dt) {
 		Enemy& obj = (Enemy&)data;
-		std::cout << "PATROLLING!" << std::endl;
+		//std::cout << "PATROLLING!" << std::endl;
 		obj.Patrol(dt);
 	};
 

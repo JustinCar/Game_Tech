@@ -96,8 +96,6 @@ void DisplayPathfinding() {
 //	delete testMachine;
 //}
 
-
-
 /*
 
 The main function should look pretty familar to you!
@@ -145,11 +143,12 @@ int main() {
 			w->ShowConsole(false);
 		}
 
-		DisplayPathfinding();
-
+		
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
+
 		g->UpdateGame(dt);
+
 	}
 	Window::DestroyGameWindow();
 }

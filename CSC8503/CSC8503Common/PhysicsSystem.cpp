@@ -126,6 +126,8 @@ void PhysicsSystem::UpdateCollisionList() {
 		if ((*i).framesLeft == numCollisionFrames) {
 			i->a->OnCollisionBegin(i->b);
 			i->b->OnCollisionBegin(i->a);
+
+			HandleCollision(i->a, i->b);
 		}
 		(*i).framesLeft = (*i).framesLeft - 1;
 		if ((*i).framesLeft < 0) {
@@ -249,6 +251,8 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 
 }
 
+
+
 bool PhysicsSystem::ShouldCollide(GameObject* a, GameObject* b)
 {
 	if (!a->getLayer() || !b->getLayer())
@@ -260,7 +264,67 @@ bool PhysicsSystem::ShouldCollide(GameObject* a, GameObject* b)
 	if (b->getLayerMask() & (1 << (a->getLayer() - 1)))
 		return false;
 
+	
+
+
 	return true;
+}
+
+void PhysicsSystem::HandleCollision(GameObject* a, GameObject* b)
+{
+	// Pickup collectables
+	if (a->getLayer() == 4 && b->getLayer() == 2)
+		HandleCollectable(b, a);
+
+	if (b->getLayer() == 4 && a->getLayer() == 2)
+		HandleCollectable(a, b);
+
+	// Returned to island
+	if (b->getLayer() == 5 && a->getLayer() == 2)
+		HandleScoreIncrease(a);
+
+	if (a->getLayer() == 5 && b->getLayer() == 2)
+		HandleScoreIncrease(b);
+}
+
+void PhysicsSystem::HandleScoreIncrease(GameObject* player)
+{
+	Player* p = static_cast<Player*>(&(*player));
+
+	if (p->getCollectables().size() == 0)
+		return;
+
+	gameWorld.increaseScore(p->getCollectables().size());
+
+	for (int i = 0; i < p->getCollectables().size(); i++)
+	{
+		Collectable* c = static_cast<Collectable*>(&(*p->getCollectables().front()));
+
+		gameWorld.RemoveConstraint(c->GetConstraint());
+		gameWorld.RemoveGameObject(p->getCollectables().front());
+
+		p->getCollectables().pop();
+	}
+}
+
+void PhysicsSystem::HandleCollectable(GameObject* player, GameObject* collectable)
+{
+
+	Player* p = static_cast<Player*>(&(*player));
+	PositionConstraint* constraint;
+
+	float maxDistance = 2;
+
+	if (p->getCollectables().size() == 0)
+		constraint = new PositionConstraint(player, collectable, maxDistance);
+	else
+		constraint = new PositionConstraint(p->getCollectables().back(), collectable, maxDistance);
+
+	Collectable* c = static_cast<Collectable*>(&(*collectable));
+	c->SetConstraint(constraint);
+
+	collectable->Trigger(*player);
+	gameWorld.AddConstraint(constraint);
 }
 
 /*
@@ -319,11 +383,6 @@ void PhysicsSystem::NarrowPhase() {
 		i = broadphaseCollisions.begin();
 		i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
-
-		if (info.a->GetName() == "FLOOR" && info.b->GetName() == "FLOOR")
-		{
-			continue;
-		}
 
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;

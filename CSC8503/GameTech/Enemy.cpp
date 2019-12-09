@@ -3,7 +3,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-Enemy::Enemy(Vector3 position) : GameObject("ENEMY")
+Enemy::Enemy(Vector3 position, GameWorld* world) : gameWorld(world), GameObject("ENEMY")
 {
 	speed = 80;
 	chaseSpeed = 200;
@@ -15,7 +15,7 @@ Enemy::Enemy(Vector3 position) : GameObject("ENEMY")
 	position.z = roundToNearestTen(position.z);
 
 	layer = 3;
-	layerMask = 5;
+	layerMask = 4;
 
 	while (!grid->ValidStartingPosition(position))
 	{
@@ -35,6 +35,7 @@ Enemy::Enemy(Vector3 position) : GameObject("ENEMY")
 	distanceFromPlayer = 0.0f;
 	chaseRadius = 50.0f;
 	attackRadius = 15.0f;
+	attacked = false;
 
 	pathfindingOffSet = Vector3(0, 10, 0);
 	index = 0;
@@ -48,12 +49,17 @@ Enemy::~Enemy()
 
 }
 
-void Enemy::UpdateEnemy(float dt)
+void Enemy::Update(float dt)
 {
 	if (player)
 		distanceFromPlayer = Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition());
 
 	stateMachine->Update(dt);
+}
+
+void Enemy::Trigger(GameObject& obj)
+{
+
 }
 
 void Enemy::InitStateMachine()
@@ -95,7 +101,13 @@ void Enemy::InitStateMachine()
 
 void Enemy::Chase(float dt)
 {
-	Vector3 dir = player->GetTransform().GetWorldPosition() - transform.GetWorldPosition();
+	if (attacked)
+		attacked = false;
+
+	Vector3 playerPos = player->GetTransform().GetWorldPosition();
+	Vector3 pos = transform.GetWorldPosition();
+	playerPos.y = pos.y;
+	Vector3 dir = playerPos - pos;
 	dir.Normalise();
 
 	physicsObject->AddForce(dir * speed);
@@ -103,7 +115,21 @@ void Enemy::Chase(float dt)
 
 void Enemy::Attack(float dt)
 {
-	
+	if (attacked)
+		return;
+
+	attacked = true;
+	Player* p = static_cast<Player*>(&(*player));
+
+	for (int i = 0; i < p->getCollectables().size(); i++)
+	{
+		Collectable* c = static_cast<Collectable*>(&(*p->getCollectables().front()));
+
+		gameWorld->RemoveConstraint(c->GetConstraint());
+		c->GetTransform().SetWorldPosition(c->GetOriginalPosition());
+
+		p->getCollectables().pop();
+	}
 }
 
 void Enemy::Idle(float dt)
@@ -136,13 +162,17 @@ void Enemy::Patrol(float dt)
 
 	node += pathfindingOffSet;
 
-	Vector3 dir = node - transform.GetWorldPosition();
+	Vector3 pos = transform.GetWorldPosition();
+
+	node.y = pos.y;
+
+	Vector3 dir = node - pos;
 	dir.Normalise();
 
 	physicsObject->AddForce(dir * speed);
 
 
-	if (Vector3::Distance(transform.GetWorldPosition(), node) <= 1)
+	if (Vector3::Distance(pos, node) <= 1)
 	{
 		index++;
 
