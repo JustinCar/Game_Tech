@@ -34,12 +34,6 @@ protected:
 	string name;
 };
 
-			std::cout << name << " received message : " << msg << std::endl;
-		}
-	}
-protected:
-	string name;
-};
 void TestNetworking() {
 	NetworkBase::Initialise();
 	

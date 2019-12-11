@@ -34,8 +34,6 @@ namespace NCL {
 			void UpdateKeys(float dt);
 			void UpdateCamera(float dt);
 			float speed;
-			Camera* mainCamera;
-			Vector3 camOffset;
 
 			//vector<GameObject> collectables;
 			float swimPower;

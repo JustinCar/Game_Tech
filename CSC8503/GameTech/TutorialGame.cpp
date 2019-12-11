@@ -78,9 +78,6 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::StartGame()
 {
-
-void TutorialGame::StartGame()
-{
 	matchTimer = 180.0f;
 	InitCamera();
 	InitWorld();
