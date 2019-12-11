@@ -76,14 +76,9 @@ TutorialGame::~TutorialGame()	{
 	delete world;
 }
 
-<<<<<<< Updated upstream
 void TutorialGame::StartGame()
 {
 
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 void TutorialGame::StartGame()
 {
 	matchTimer = 180.0f;
@@ -130,22 +125,13 @@ void TutorialGame::RenderMenu()
 		
 }
 
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 void TutorialGame::UpdateGame(float dt) {
 
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-<<<<<<< Updated upstream
 	if (!playing)
 		RenderMenu();
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 
 	if (!playing)
 	{
@@ -184,10 +170,6 @@ void TutorialGame::UpdateGame(float dt) {
 		}
 	}
 	
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 	if (lockedObject != nullptr) {
 		LockedCameraMovement();
 	}
@@ -200,13 +182,10 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
 		Vector2(10, 20)); // Draw debug text at 10 ,20
 
-<<<<<<< Updated upstream
-=======
 	
 	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
 		Vector2(10, 20)); // Draw debug text at 10 ,20
 
->>>>>>> Stashed changes
 	UpdateKeys();
 
 	if (useGravity) {
@@ -400,13 +379,7 @@ bool TutorialGame::SelectObject() {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
-<<<<<<< Updated upstream
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-<<<<<<< Updated upstream
-
-=======
-=======
->>>>>>> Stashed changes
 
 				renderer->DrawString("DEBUG INFO: ",
 					Vector2(10, 300), Vector4(0, 0, 1, 1));
@@ -414,11 +387,6 @@ bool TutorialGame::SelectObject() {
 					Vector2(10, 200), Vector4(0, 0, 1, 1));
 				renderer->DrawString("SIZE: " + selectionObject->GetTransform().GetLocalScale().ToString(),
 					Vector2(10, 100), Vector4(0, 0, 1, 1));
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 				selectionObject = nullptr;
 			}
 
@@ -541,63 +509,6 @@ void TutorialGame::InitWorld() {
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
-	for (int i = 0; i < 30; i++)
-	{
-		int xPos = rand() % 480;
-		int zPos = rand() % 420;
-		AddAppleToWorld(Vector3(xPos, 10, zPos));
-	}
-
-	for (int i = 0; i < 20; i++)
-	{
-		int xPos = rand() % 480;
-		int zPos = rand() % 420;
-		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
-	}
-
-	for (int i = 0; i < 1; i++) 
-	{
-		int xPos = rand() % 480;
-		int zPos = rand() % 420;
-		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
-	}
-
-	AddCharacterToWorld(offSet + Vector3(65, 10, 0));
-
-	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
-	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
-
-	AddBridgeToWorld(offSet + westBridgeStartPos);
-	AddBridgeToWorld(offSet + eastBridgeStartPos);
-
-	Vector4 green = Vector4(0, 0.6, 0, 1);
-	Vector4 blue = Vector4(0, 0, 1, 1);
-	Vector4 grey = Vector4(0.41, 0.41, 0.41, 1);
-	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
-
-	AddObstacles();
-
-	AddTerrainToWorld(offSet + Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
-	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
-	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
-	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
-
-	AddTerrainToWorld(offSet + Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
-	AddTerrainToWorld(offSet + Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
-	AddTerrainToWorld(offSet + Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
-	AddTerrainToWorld(offSet + Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
-
-	GameObject* island = AddTerrainToWorld(offSet + Vector3(20, -12, 15), Vector3(20, 20, 20), green); // Island
-	island->setLayer(5);
-	island->setLayerMask(17);
-	
-	AddTerrainToWorld(offSet + Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
-
-<<<<<<< Updated upstream
-	AddFloorToWorld(Vector3(0, -2, 0));
-}
-
-	//From here on it's functions to add in objects to the world!
 	for (int i = 0; i < 1; i++)
 	{
 		int xPos = rand() % 480;
@@ -654,7 +565,6 @@ void TutorialGame::InitWorld() {
 }
 
 //From here on it's functions to add in objects to the world!
-<<<<<<< Updated upstream
 void TutorialGame::AddObstacles()
 {
 	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
@@ -680,95 +590,6 @@ void TutorialGame::AddObstacles()
 	AddTerrainToWorld(offset + Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
 	AddTerrainToWorld(offset + Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
 }
-
-=======
-=======
-	for (int i = 0; i < 1; i++)
-	{
-		int xPos = rand() % 480;
-		int zPos = rand() % 420;
-		AddAppleToWorld(Vector3(xPos, 10, zPos));
-		world->IncrementCollectableCount();
-	}
-
-	for (int i = 0; i < 0; i++)
-	{
-		int xPos = rand() % 480;
-		int zPos = rand() % 420;
-		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
-		world->IncrementCollectableCount();
-	}
-
-	for (int i = 0; i < 6; i++) 
-	{
-		int xPos = rand() % 480;
-		int zPos = rand() % 420;
-		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
-	}
-
-	AddCharacterToWorld(offSet + Vector3(65, 10, 0));
-
-	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
-	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
-
-	AddBridgeToWorld(offSet + westBridgeStartPos);
-	AddBridgeToWorld(offSet + eastBridgeStartPos);
-
-	Vector4 green = Vector4(0, 0.6, 0, 1);
-	Vector4 blue = Vector4(0, 0, 1, 1);
-	Vector4 grey = Vector4(0.41, 0.41, 0.41, 1);
-	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
-
-	AddObstacles();
-
-	AddTerrainToWorld(offSet + Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
-	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
-	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
-	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
-
-	AddTerrainToWorld(offSet + Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
-	AddTerrainToWorld(offSet + Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
-	AddTerrainToWorld(offSet + Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
-	AddTerrainToWorld(offSet + Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
-
-	GameObject* island = AddTerrainToWorld(offSet + Vector3(20, -11, 15), Vector3(20, 20, 20), green); // Island
-	island->setLayer(5);
-	island->setLayerMask(49);
-	
-	AddLakeToWorld(offSet + Vector3(20, -12, 15), Vector3(80, 20, 50), blue); // Lake
-}
-
-//From here on it's functions to add in objects to the world!
->>>>>>> Stashed changes
-void TutorialGame::AddObstacles()
-{
-	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
-
-	AddTerrainToWorld(Vector3(430, 18, 150), Vector3(55, 10, 5), brown);
-	AddTerrainToWorld(Vector3(380, 18, 165), Vector3(5, 10, 10), brown);
-	AddTerrainToWorld(Vector3(360, 18, 170), Vector3(15, 10, 5), brown);
-	AddTerrainToWorld(Vector3(430, 18, 180), Vector3(5, 10, 15), brown);
-	AddTerrainToWorld(Vector3(405, 18, 190), Vector3(30, 10, 5), brown);
-	AddTerrainToWorld(Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
-	AddTerrainToWorld(Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
-	AddTerrainToWorld(Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
-
-	Vector3 offset(-310, 0, 10);
-
-	AddTerrainToWorld(Vector3(20, 18, 140), Vector3(30, 10, 5), brown);
-	AddTerrainToWorld(offset + Vector3(430, 18, 150), Vector3(55, 10, 5), brown);
-	AddTerrainToWorld(offset + Vector3(380, 18, 165), Vector3(5, 10, 10), brown);
-	AddTerrainToWorld(offset + Vector3(360, 18, 170), Vector3(15, 10, 5), brown);
-	AddTerrainToWorld(offset + Vector3(430, 18, 180), Vector3(5, 10, 15), brown);
-	AddTerrainToWorld(offset + Vector3(405, 18, 190), Vector3(30, 10, 5), brown);
-	AddTerrainToWorld(offset + Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
-	AddTerrainToWorld(offset + Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
-	AddTerrainToWorld(offset + Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
-}
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 /*
 
@@ -784,11 +605,6 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetTransform().SetWorldScale(floorSize);
 	floor->GetTransform().SetWorldPosition(position);
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, nullptr, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
@@ -813,10 +629,6 @@ GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, const Vecto
 	floor->GetTransform().SetWorldScale(size);
 	floor->GetTransform().SetWorldPosition(position);
 
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
@@ -830,11 +642,6 @@ GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, const Vecto
 	return floor;
 }
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 GameObject* TutorialGame::AddLakeToWorld(const Vector3& position, const Vector3& size, const Vector4& colour) {
 	GameObject* floor = new GameObject("LAKE");
 
@@ -905,11 +712,6 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
 	world->AddConstraint(constraint);
 }
 
-
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 /*
 
 Builds a game object that uses a sphere mesh for its graphics, and a bounding sphere for its

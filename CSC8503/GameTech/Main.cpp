@@ -15,16 +15,6 @@
 using namespace NCL;
 using namespace CSC8503;
 
-<<<<<<< Updated upstream
-
-void TestStateMachine() {
-}
-=======
-<<<<<<< Updated upstream
-void TestStateMachine() {
-}
-=======
->>>>>>> Stashed changes
 class TestPacketReceiver : public PacketReceiver {
 public:
 	TestPacketReceiver(string name) {
@@ -36,8 +26,6 @@ public:
 			StringPacket * realPacket = (StringPacket*)payload;
 
 			string msg = realPacket -> GetStringFromData();
-<<<<<<< Updated upstream
-=======
 
 			std::cout << name << " received message : " << msg << std::endl;
 		}
@@ -45,8 +33,6 @@ public:
 protected:
 	string name;
 };
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 			std::cout << name << " received message : " << msg << std::endl;
 		}
@@ -225,11 +211,8 @@ int main() {
 
 		DisplayPathfinding();
 
-<<<<<<< Updated upstream
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
-=======
->>>>>>> Stashed changes
 		g->UpdateGame(dt);
 
 	}

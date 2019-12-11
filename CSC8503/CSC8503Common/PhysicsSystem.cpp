@@ -162,8 +162,6 @@ a particular pair will only be added once, so objects colliding for
 multiple frames won't flood the set with duplicates.
 */
 void PhysicsSystem::BasicCollisionDetection() {
-<<<<<<< Updated upstream
-=======
 	std::vector < GameObject* >::const_iterator first;
 	std::vector < GameObject* >::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
@@ -187,7 +185,6 @@ void PhysicsSystem::BasicCollisionDetection() {
 					<< " and " << (*j) -> GetName() << std::endl;*/
 				info.framesLeft = numCollisionFrames;
 				allCollisions.insert(info);
->>>>>>> Stashed changes
 
 	std::vector < GameObject* >::const_iterator first;
 	std::vector < GameObject* >::const_iterator last;
@@ -275,8 +272,6 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	physA -> ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
 	physB -> ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
 
-<<<<<<< Updated upstream
-=======
 	if (a->getLayerMask() & (1 << (b->getLayer() - 1)))
 		return false;
 
@@ -345,7 +340,6 @@ void PhysicsSystem::HandleCollectable(GameObject* player, GameObject* collectabl
 
 	collectable->Trigger(*player);
 	gameWorld.AddConstraint(constraint);
->>>>>>> Stashed changes
 }
 
 

@@ -43,11 +43,6 @@ namespace NCL {
 			void LockedCameraMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 
 			void AddObstacles();
 
@@ -56,10 +51,6 @@ namespace NCL {
 
 			void AddBridgeToWorld(Vector3 startPos);
 
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			//IT'S HAPPENING
@@ -72,11 +63,6 @@ namespace NCL {
 			Player* goose;
 			vector<Enemy*> enemies;
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 			void RenderMenu();
 			bool playButtonSelected;
 			bool playing;
@@ -84,10 +70,6 @@ namespace NCL {
 
 			float matchTimer;
 			float gameOverScreenCoolDown;
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
