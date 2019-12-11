@@ -64,9 +64,13 @@ namespace NCL {
 			vector<Enemy*> enemies;
 
 			void RenderMenu();
-			bool playButtonSelected;
+			int buttonSelected;
 			bool playing;
 			void StartGame();
+
+			bool isNetworkedGame;
+			bool isServer;
+			int playerID;
 
 			float matchTimer;
 			float gameOverScreenCoolDown;

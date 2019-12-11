@@ -3,7 +3,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-Enemy::Enemy(Vector3 position, GameWorld* world) : gameWorld(world), GameObject("ENEMY")
+Enemy::Enemy(Vector3 position, GameWorld* world, bool& isServer) : gameWorld(world), isServerEnemy(isServer), GameObject("ENEMY")
 {
 	speed = 80;
 	chaseSpeed = 200;
@@ -51,6 +51,9 @@ Enemy::~Enemy()
 
 void Enemy::Update(float dt)
 {
+	if (!isServerEnemy)
+		return;
+
 	if (player)
 		distanceFromPlayer = Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition());
 

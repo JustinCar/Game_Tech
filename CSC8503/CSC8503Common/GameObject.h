@@ -63,6 +63,10 @@ namespace NCL {
 				physicsObject = newObject;
 			}
 
+			void SetNetworkObject(NetworkObject* newObject) {
+				networkObject = newObject;
+			}
+
 			const string& GetName() const {
 				return name;
 			}
