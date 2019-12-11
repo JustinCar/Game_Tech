@@ -23,16 +23,34 @@ namespace NCL {
 			float yaw;
 
 			std::queue<GameObject*>& getCollectables() { return collectables; };
+
+			virtual void OnCollisionBegin(GameObject* otherObject);
+
+			virtual void OnCollisionEnd(GameObject* otherObject);
+
+			bool IsSwimming() { return isSwimming; };
 			
 		protected:
 			void UpdateKeys(float dt);
 			void UpdateCamera(float dt);
 			float speed;
+<<<<<<< Updated upstream
+			Camera* mainCamera;
+			Vector3 camOffset;
+
+			//vector<GameObject> collectables;
+=======
+>>>>>>> Stashed changes
+			float swimPower;
+			float swimTimer;
+			float swimCoolDown;
+			bool isSwimming;
 			Camera* mainCamera;
 			Vector3 camOffset;
 			float jumpPower;
+			float jumpTimer;
+			float jumpCoolDown;
 
-			//vector<GameObject> collectables;
 			std::queue<GameObject*> collectables;
 		};
 	}

@@ -13,7 +13,7 @@ GameObject::GameObject(string objectName)	{
 }
 
 GameObject::~GameObject()	{
-	delete boundingVolume;
+ 	delete boundingVolume;
 	delete physicsObject;
 	delete renderObject;
 	delete networkObject;

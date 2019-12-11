@@ -20,6 +20,7 @@ namespace NCL {
 			void InitialiseAssets();
 
 			void InitCamera();
+			void ResetCamera();
 			void UpdateKeys();
 
 			void InitWorld();
@@ -42,13 +43,23 @@ namespace NCL {
 			void LockedCameraMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 
 			void AddObstacles();
 
 			GameObject* AddTerrainToWorld(const Vector3& position, const Vector3& size, const Vector4& colour);
+			GameObject* AddLakeToWorld(const Vector3& position, const Vector3& size, const Vector4& colour);
 
 			void AddBridgeToWorld(Vector3 startPos);
 
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			//IT'S HAPPENING
@@ -61,12 +72,22 @@ namespace NCL {
 			Player* goose;
 			vector<Enemy*> enemies;
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 			void RenderMenu();
 			bool playButtonSelected;
 			bool playing;
 			void StartGame();
 
 			float matchTimer;
+			float gameOverScreenCoolDown;
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;

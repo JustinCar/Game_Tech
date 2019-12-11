@@ -21,6 +21,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 }
 
 PhysicsSystem::~PhysicsSystem()	{
+
 }
 
 void PhysicsSystem::SetGravity(const Vector3& g) {
@@ -79,7 +80,7 @@ void PhysicsSystem::Update(float dt) {
 		UpdateObjectAABBs();
 	}
 
-	while(dTOffset > iterationDt *0.5) {
+	while(dTOffset > iterationDt * 0.5) {
 		IntegrateAccel(iterationDt); //Update accelerations from external forces
 		if (useBroadPhase) {
 			BroadPhase();
@@ -161,6 +162,8 @@ a particular pair will only be added once, so objects colliding for
 multiple frames won't flood the set with duplicates.
 */
 void PhysicsSystem::BasicCollisionDetection() {
+<<<<<<< Updated upstream
+=======
 	std::vector < GameObject* >::const_iterator first;
 	std::vector < GameObject* >::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
@@ -176,7 +179,30 @@ void PhysicsSystem::BasicCollisionDetection() {
 		
 			}
 
+			CollisionDetection::CollisionInfo info;
 
+			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
+				ImpulseResolveCollision(*info.a, *info.b, info.point);
+				/*std::cout << " Collision between " << (*i) -> GetName()
+					<< " and " << (*j) -> GetName() << std::endl;*/
+				info.framesLeft = numCollisionFrames;
+				allCollisions.insert(info);
+>>>>>>> Stashed changes
+
+	std::vector < GameObject* >::const_iterator first;
+	std::vector < GameObject* >::const_iterator last;
+	gameWorld.GetObjectIterators(first, last);
+	
+	for (auto i = first; i != last; ++i) {
+		if ((*i) -> GetPhysicsObject() == nullptr) {
+			continue;
+
+		}
+		for (auto j = i + 1; j != last; ++j) {
+			if ((*j) -> GetPhysicsObject() == nullptr) {
+				continue;
+		
+			}
 
 			CollisionDetection::CollisionInfo info;
 
@@ -249,6 +275,77 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	physA -> ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
 	physB -> ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
 
+<<<<<<< Updated upstream
+=======
+	if (a->getLayerMask() & (1 << (b->getLayer() - 1)))
+		return false;
+
+	if (b->getLayerMask() & (1 << (a->getLayer() - 1)))
+		return false;
+
+	
+
+
+	return true;
+}
+
+void PhysicsSystem::HandleCollision(GameObject* a, GameObject* b)
+{
+	// Pickup collectables
+	if (a->getLayer() == 4 && b->getLayer() == 2)
+		HandleCollectable(b, a);
+
+	if (b->getLayer() == 4 && a->getLayer() == 2)
+		HandleCollectable(a, b);
+
+	// Returned to island
+	if (b->getLayer() == 5 && a->getLayer() == 2)
+		HandleScoreIncrease(a);
+
+	if (a->getLayer() == 5 && b->getLayer() == 2)
+		HandleScoreIncrease(b);
+}
+
+void PhysicsSystem::HandleScoreIncrease(GameObject* player)
+{
+	Player* p = static_cast<Player*>(&(*player));
+
+	if (p->getCollectables().size() == 0)
+		return;
+
+	for (int i = 0; i < p->getCollectables().size(); i++)
+	{
+		Collectable* c = static_cast<Collectable*>(&(*p->getCollectables().front()));
+
+		gameWorld.DecrementCollectableCount();
+
+		gameWorld.increaseScore(c->GetPoints());
+
+		gameWorld.RemoveConstraint(c->GetConstraint());
+		gameWorld.RemoveGameObject(p->getCollectables().front());
+
+		p->getCollectables().pop();
+	}
+}
+
+void PhysicsSystem::HandleCollectable(GameObject* player, GameObject* collectable)
+{
+	Player* p = static_cast<Player*>(&(*player));
+	PositionConstraint* constraint;
+
+	float maxDistance = 2;
+
+	if (p->getCollectables().size() == 0)
+		constraint = new PositionConstraint(player, collectable, maxDistance);
+	else
+		constraint = new PositionConstraint(p->getCollectables().back(), collectable, maxDistance);
+
+	Collectable* c = static_cast<Collectable*>(&(*collectable));
+	c->SetConstraint(constraint);
+
+	collectable->Trigger(*player);
+	gameWorld.AddConstraint(constraint);
+>>>>>>> Stashed changes
 }
 
 
@@ -299,6 +396,10 @@ void PhysicsSystem::HandleScoreIncrease(GameObject* player)
 	for (int i = 0; i < p->getCollectables().size(); i++)
 	{
 		Collectable* c = static_cast<Collectable*>(&(*p->getCollectables().front()));
+
+		gameWorld.DecrementCollectableCount();
+
+		gameWorld.increaseScore(c->GetPoints());
 
 		gameWorld.RemoveConstraint(c->GetConstraint());
 		gameWorld.RemoveGameObject(p->getCollectables().front());
@@ -420,7 +521,7 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 		Vector3 accel = force * inverseMass;
 		
 		if (applyGravity && inverseMass > 0) {
-			accel += gravity; // don ’t move infinitely heavy things
+			accel += gravity; // don ï¿½t move infinitely heavy things
 
 		}
 		

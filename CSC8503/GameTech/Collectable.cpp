@@ -25,7 +25,10 @@ void Collectable::Trigger(GameObject& obj)
 
 	Player* p = static_cast<Player*>(&obj);
 
+<<<<<<< Updated upstream
 	//inFront = p->getCollectables().back();
+=======
+>>>>>>> Stashed changes
 	p->getCollectables().push(this);
 	int i = 0;
 }

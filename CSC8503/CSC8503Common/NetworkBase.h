@@ -107,6 +107,10 @@ protected:
 	}
 
 	ENetHost* netHandle;
+	ENetPeer* playerOne;
+	ENetPeer* playerTwo;
+
+	std::map<int, ENetPeer*> players;
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };

@@ -59,6 +59,17 @@ bool GameServer::SendGlobalPacket(GamePacket& packet) {
 	return true;
 }
 
+bool GameServer::SendPacketToPeer(GamePacket& packet, int id) {
+	ENetPacket* dataPacket = enet_packet_create(&packet, packet.GetTotalSize(), 0);
+
+	if (id == 1)
+		enet_peer_send(playerOne, 0, dataPacket);
+	else if (id == 2)
+		enet_peer_send(playerTwo, 0, dataPacket);
+	
+	return true;
+}
+
 void GameServer::UpdateServer() {
 	if (!netHandle) {
 		return;
@@ -75,11 +86,35 @@ void GameServer::UpdateServer() {
 			std::cout << "Server: New client connected" << std::endl;
 			NewPlayerPacket player(peer);
 			SendGlobalPacket(player);
+
+			if (!playerOne)
+			{
+				playerOne = p;
+				players.insert(std::pair<int, ENetPeer*>(1, playerOne));
+			}
+			else if (!playerTwo)
+			{
+				playerTwo = p;
+				players.insert(std::pair<int, ENetPeer*>(2, playerTwo));
+			}
+				
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_DISCONNECT) {
 			std::cout << "Server: A client has disconnected" << std::endl;
 			PlayerDisconnectPacket player(peer);
 			SendGlobalPacket(player);
+
+			if (playerOne == p)
+			{
+				playerOne = nullptr;
+				players.erase(players.begin(), players.find(1));
+			}
+			else if (playerTwo == p)
+			{
+				playerTwo = nullptr;
+				players.erase(players.begin(), players.find(2));
+			}
+				
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) {
 			GamePacket* packet = (GamePacket*)event.packet->data;

@@ -21,7 +21,8 @@ TutorialGame::TutorialGame()	{
 
 	goose = nullptr;
 
-	matchTimer = 3.0f;
+	matchTimer = 0;
+	gameOverScreenCoolDown = 5.0f;
 
 	playButtonSelected = true;
 	playing = false;
@@ -75,8 +76,17 @@ TutorialGame::~TutorialGame()	{
 	delete world;
 }
 
+<<<<<<< Updated upstream
 void TutorialGame::StartGame()
 {
+
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+void TutorialGame::StartGame()
+{
+	matchTimer = 180.0f;
 	InitCamera();
 	InitWorld();
 }
@@ -120,41 +130,83 @@ void TutorialGame::RenderMenu()
 		
 }
 
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 void TutorialGame::UpdateGame(float dt) {
 
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-
+<<<<<<< Updated upstream
 	if (!playing)
 		RenderMenu();
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+
+	if (!playing)
+	{
+		if (matchTimer > 0)
+		{
+			renderer->DrawString("!!GAMEOVER!!",
+						Vector2(450, 600), Vector4(0, 0, 1, 1));
+
+			renderer->DrawString("FINAL SCORE: " + std::to_string(world->getScore()),
+				Vector2(425, 400), Vector4(0, 0, 1, 1));
+			matchTimer -= dt;
+		}
+		else	
+			RenderMenu();
+	}
+		
 	else
 	{
 		matchTimer -= dt;
+
+		renderer->DrawString("SCORE: " + std::to_string(world->getScore()),
+			Vector2(50, 600), Vector4(0, 0, 1, 1));
 
 		int seconds = matchTimer;
 		renderer->DrawString(std::to_string(seconds / 60) + "." + std::to_string(seconds % 60),
 			Vector2(640, 600), Vector4(0, 0, 1, 1));
 
 		// Gameover
-		if (matchTimer <= 0)
+		if ((matchTimer <= 0) || (world->GetCollectableCount() == 0))
 		{
-			renderer->DrawString("!!GAMEOVER!!",
-				Vector2(640, 600), Vector4(0, 0, 1, 1));
-
+			physics->Clear();
+			world->ClearAndErase();
 			playing = false;
+			matchTimer = gameOverScreenCoolDown;
+			ResetCamera();
 		}
 	}
 	
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 	if (lockedObject != nullptr) {
 		LockedCameraMovement();
 	}
-
 	
 
 	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
 		Vector2(10, 20)); // Draw debug text at 10 ,20
 
+	
+	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
+		Vector2(10, 20)); // Draw debug text at 10 ,20
+
+<<<<<<< Updated upstream
+=======
+	
+	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
+		Vector2(10, 20)); // Draw debug text at 10 ,20
+
+>>>>>>> Stashed changes
 	UpdateKeys();
 
 	if (useGravity) {
@@ -348,9 +400,25 @@ bool TutorialGame::SelectObject() {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
+<<<<<<< Updated upstream
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
-				std::cout << "Position: " <<selectionObject->GetTransform().GetWorldPosition() << std::endl;
-				std::cout << "Size: " << selectionObject->GetTransform().GetLocalScale() << std::endl;
+<<<<<<< Updated upstream
+
+=======
+=======
+>>>>>>> Stashed changes
+
+				renderer->DrawString("DEBUG INFO: ",
+					Vector2(10, 300), Vector4(0, 0, 1, 1));
+				renderer->DrawString("POSITION: " + selectionObject->GetTransform().GetWorldPosition().ToString(),
+					Vector2(10, 200), Vector4(0, 0, 1, 1));
+				renderer->DrawString("SIZE: " + selectionObject->GetTransform().GetLocalScale().ToString(),
+					Vector2(10, 100), Vector4(0, 0, 1, 1));
+<<<<<<< Updated upstream
+
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 				selectionObject = nullptr;
 			}
 
@@ -359,7 +427,6 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 				return true;
 			}
 			else {
@@ -422,7 +489,7 @@ void TutorialGame::MoveSelectedObject() {
 	forceMagnitude += Window::GetMouse() -> GetWheelMovement() * 100.0f;
 	
 	if (!selectionObject) {
-		return;// we haven ’t selected anything !
+		return;// we haven ï¿½t selected anything !
 
 	}
 	// Push the selected object !
@@ -450,6 +517,15 @@ void TutorialGame::InitCamera() {
 	world->GetMainCamera()->SetPitch(-15.0f);
 	world->GetMainCamera()->SetYaw(315.0f);
 	world->GetMainCamera()->SetPosition(Vector3(-60, 40, 60));
+	lockedObject = nullptr;
+}
+
+void TutorialGame::ResetCamera() {
+	world->GetMainCamera()->SetNearPlane(0.0f);
+	world->GetMainCamera()->SetFarPlane(0.0f);
+	world->GetMainCamera()->SetPitch(0.0f);
+	world->GetMainCamera()->SetYaw(0.0f);
+	world->GetMainCamera()->SetPosition(Vector3(0, 0, 0));
 	lockedObject = nullptr;
 }
 
@@ -516,10 +592,69 @@ void TutorialGame::InitWorld() {
 	island->setLayerMask(17);
 	
 	AddTerrainToWorld(offSet + Vector3(20, -22, 15), Vector3(80, 2, 50), blue); // Lake
+
+<<<<<<< Updated upstream
+	AddFloorToWorld(Vector3(0, -2, 0));
+}
+
+	//From here on it's functions to add in objects to the world!
+	for (int i = 0; i < 1; i++)
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		AddAppleToWorld(Vector3(xPos, 10, zPos));
+		world->IncrementCollectableCount();
+	}
+
+	for (int i = 0; i < 0; i++)
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
+		world->IncrementCollectableCount();
+	}
+
+	for (int i = 0; i < 6; i++) 
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
+	}
+
+	AddCharacterToWorld(offSet + Vector3(65, 10, 0));
+
+	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
+	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
+
+	AddBridgeToWorld(offSet + westBridgeStartPos);
+	AddBridgeToWorld(offSet + eastBridgeStartPos);
+
+	Vector4 green = Vector4(0, 0.6, 0, 1);
+	Vector4 blue = Vector4(0, 0, 1, 1);
+	Vector4 grey = Vector4(0.41, 0.41, 0.41, 1);
+	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
+
+	AddObstacles();
+
+	AddTerrainToWorld(offSet + Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
+	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
+
+	AddTerrainToWorld(offSet + Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
+	AddTerrainToWorld(offSet + Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
+	AddTerrainToWorld(offSet + Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
+	AddTerrainToWorld(offSet + Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
+
+	GameObject* island = AddTerrainToWorld(offSet + Vector3(20, -11, 15), Vector3(20, 20, 20), green); // Island
+	island->setLayer(5);
+	island->setLayerMask(49);
+	
+	AddLakeToWorld(offSet + Vector3(20, -12, 15), Vector3(80, 20, 50), blue); // Lake
 }
 
 //From here on it's functions to add in objects to the world!
-
+<<<<<<< Updated upstream
 void TutorialGame::AddObstacles()
 {
 	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
@@ -546,6 +681,95 @@ void TutorialGame::AddObstacles()
 	AddTerrainToWorld(offset + Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
 }
 
+=======
+=======
+	for (int i = 0; i < 1; i++)
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		AddAppleToWorld(Vector3(xPos, 10, zPos));
+		world->IncrementCollectableCount();
+	}
+
+	for (int i = 0; i < 0; i++)
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
+		world->IncrementCollectableCount();
+	}
+
+	for (int i = 0; i < 6; i++) 
+	{
+		int xPos = rand() % 480;
+		int zPos = rand() % 420;
+		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
+	}
+
+	AddCharacterToWorld(offSet + Vector3(65, 10, 0));
+
+	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
+	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
+
+	AddBridgeToWorld(offSet + westBridgeStartPos);
+	AddBridgeToWorld(offSet + eastBridgeStartPos);
+
+	Vector4 green = Vector4(0, 0.6, 0, 1);
+	Vector4 blue = Vector4(0, 0, 1, 1);
+	Vector4 grey = Vector4(0.41, 0.41, 0.41, 1);
+	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
+
+	AddObstacles();
+
+	AddTerrainToWorld(offSet + Vector3(180, -12, 15), Vector3(80, 20, 50), green); // West floor
+	AddTerrainToWorld(offSet + Vector3(-140, -12, 15), Vector3(80, 20, 50), green); // East floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, -115), Vector3(240, 20, 80), green); // South floor
+	AddTerrainToWorld(offSet + Vector3(20, -12, 145), Vector3(240, 20, 80), green); // North floor
+
+	AddTerrainToWorld(offSet + Vector3(260, 98, 15), Vector3(2, 100, 240), brown); // West wall
+	AddTerrainToWorld(offSet + Vector3(-220, 98, 15), Vector3(2, 100, 240), brown); // East wall
+	AddTerrainToWorld(offSet + Vector3(20, 98, 225), Vector3(240, 100, 2), brown); // South wall
+	AddTerrainToWorld(offSet + Vector3(20, 98, -195), Vector3(240, 100, 2), brown); // North wall
+
+	GameObject* island = AddTerrainToWorld(offSet + Vector3(20, -11, 15), Vector3(20, 20, 20), green); // Island
+	island->setLayer(5);
+	island->setLayerMask(49);
+	
+	AddLakeToWorld(offSet + Vector3(20, -12, 15), Vector3(80, 20, 50), blue); // Lake
+}
+
+//From here on it's functions to add in objects to the world!
+>>>>>>> Stashed changes
+void TutorialGame::AddObstacles()
+{
+	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
+
+	AddTerrainToWorld(Vector3(430, 18, 150), Vector3(55, 10, 5), brown);
+	AddTerrainToWorld(Vector3(380, 18, 165), Vector3(5, 10, 10), brown);
+	AddTerrainToWorld(Vector3(360, 18, 170), Vector3(15, 10, 5), brown);
+	AddTerrainToWorld(Vector3(430, 18, 180), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(Vector3(405, 18, 190), Vector3(30, 10, 5), brown);
+	AddTerrainToWorld(Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
+	AddTerrainToWorld(Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
+
+	Vector3 offset(-310, 0, 10);
+
+	AddTerrainToWorld(Vector3(20, 18, 140), Vector3(30, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(430, 18, 150), Vector3(55, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(380, 18, 165), Vector3(5, 10, 10), brown);
+	AddTerrainToWorld(offset + Vector3(360, 18, 170), Vector3(15, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(430, 18, 180), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(offset + Vector3(405, 18, 190), Vector3(30, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(380, 18, 210), Vector3(5, 10, 15), brown);
+	AddTerrainToWorld(offset + Vector3(365, 18, 230), Vector3(45, 10, 5), brown);
+	AddTerrainToWorld(offset + Vector3(455, 18, 230), Vector3(20, 10, 5), brown);
+}
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+
 /*
 
 A single function to add a large immoveable cube to the bottom of our world
@@ -560,6 +784,11 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetTransform().SetWorldScale(floorSize);
 	floor->GetTransform().SetWorldPosition(position);
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, nullptr, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
@@ -577,9 +806,44 @@ GameObject* TutorialGame::AddTerrainToWorld(const Vector3& position, const Vecto
 	GameObject* floor = new GameObject("FLOOR");
 
 	floor->setLayer(1);
-	floor->setLayerMask(1);
+	floor->setLayerMask(49);
 
 	AABBVolume* volume = new AABBVolume(size);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform().SetWorldScale(size);
+	floor->GetTransform().SetWorldPosition(position);
+
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetRenderObject()->SetColour(colour);
+
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(floor);
+
+	return floor;
+}
+
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+GameObject* TutorialGame::AddLakeToWorld(const Vector3& position, const Vector3& size, const Vector4& colour) {
+	GameObject* floor = new GameObject("LAKE");
+
+	floor->setLayer(6);
+	floor->setLayerMask(49);
+
+	Vector3 colliderSize = size;
+	colliderSize.y -= 1.2;
+	AABBVolume* volume = new AABBVolume(colliderSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform().SetWorldScale(size);
 	floor->GetTransform().SetWorldPosition(position);
@@ -611,9 +875,15 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
 
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
 
+	start->setLayer(1);
+	start->setLayerMask(35);
+
 	start->GetRenderObject()->SetColour(brown);
 
 	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
+
+	end->setLayer(1);
+	end->setLayerMask(35);
 
 	end->GetRenderObject()->SetColour(brown);
 
@@ -621,6 +891,10 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
 
 	for (int i = 0; i < numLinks; ++i) {
 		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
+		
+		block->setLayer(1);
+		block->setLayerMask(35);
+		
 		block->GetRenderObject()->SetColour(brown);
 		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
 		world->AddConstraint(constraint);
@@ -632,6 +906,10 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
 }
 
 
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 /*
 
 Builds a game object that uses a sphere mesh for its graphics, and a bounding sphere for its
@@ -685,7 +963,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 {
 	float size			= 1.0f;
-	float inverseMass	= 1.0f;
+	float inverseMass	= 0.1f;
 
 	goose = new Player();
 

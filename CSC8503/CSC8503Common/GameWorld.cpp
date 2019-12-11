@@ -23,6 +23,7 @@ GameWorld::~GameWorld()	{
 void GameWorld::Clear() {
 	gameObjects.clear();
 	constraints.clear();
+	score = 0;
 }
 
 void GameWorld::ClearAndErase() {
@@ -33,6 +34,7 @@ void GameWorld::ClearAndErase() {
 		delete i;
 	}
 	Clear();
+	score = 0;
 }
 
 void GameWorld::AddGameObject(GameObject* o) {
@@ -40,7 +42,7 @@ void GameWorld::AddGameObject(GameObject* o) {
 }
 
 void GameWorld::RemoveGameObject(GameObject* o) {
-	std::remove(gameObjects.begin(), gameObjects.end(), o);
+	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), o), gameObjects.end());
 }
 
 void GameWorld::GetObjectIterators(

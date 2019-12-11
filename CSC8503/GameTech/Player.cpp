@@ -5,11 +5,18 @@ using namespace CSC8503;
 
 Player::Player() : GameObject("PLAYER") 
 {
-	speed = 50;
-	camOffset = Vector3(0, 10, -10);
+	speed = 500;
+	camOffset = Vector3(0, 15, -10);
 	yaw = 0.0f;
 	mainCamera = nullptr;
-	jumpPower = 100;
+	jumpPower = 10000;
+	jumpCoolDown = 2;
+	jumpTimer = 2;
+
+	swimPower = 10000;
+	swimTimer = 1;
+	swimCoolDown = 1;
+	isSwimming = false;
 
 	layer = 2;
 	layerMask = 0; // Collide with everything
@@ -59,6 +66,7 @@ void Player::UpdateCamera(float dt)
 void Player::UpdateKeys(float dt)
 {
 	yaw -= (Window::GetMouse()->GetRelativePosition().x);
+	jumpTimer -= dt;
 
 	if (yaw < 0) {
 		yaw += 360.0f;
@@ -77,24 +85,44 @@ void Player::UpdateKeys(float dt)
 
 	Vector3 right = Vector3(x.x, x.y, x.z);
 
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE) && jumpTimer <= 0) {
+		jumpTimer = jumpCoolDown;
+		physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
+	}
+
+	if (isSwimming)
+	{
+		swimTimer -= dt;
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W) && swimTimer <= 0) {
+			swimTimer = swimCoolDown;
+			physicsObject->AddForce(forward * swimPower);
+		}
+	}
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W) && !isSwimming) {
 		physicsObject->AddForce(forward * speed);
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::S)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::S) && !isSwimming) {
 		physicsObject->AddForce(-forward * speed);
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::A)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::A) && !isSwimming) {
 		physicsObject->AddForce(right * speed);
 
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::D)) {
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::D) && !isSwimming) {
 		physicsObject->AddForce(-right * speed);
 	}
+}
 
-	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
-		physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
-	}
+void Player::OnCollisionBegin(GameObject* otherObject) {
+	if (otherObject->getLayer() == 6)
+		isSwimming = true;
+}
+
+void Player::OnCollisionEnd(GameObject* otherObject) {
+	if (otherObject->getLayer() == 6)
+		isSwimming = false;
 }

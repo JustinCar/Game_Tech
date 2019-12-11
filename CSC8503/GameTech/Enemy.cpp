@@ -33,8 +33,8 @@ Enemy::Enemy(Vector3 position, GameWorld* world) : gameWorld(world), GameObject(
 	timeSpentPatrolling = 0.0f;
 
 	distanceFromPlayer = 0.0f;
-	chaseRadius = 50.0f;
-	attackRadius = 15.0f;
+	chaseRadius = 30.0f;
+	attackRadius = 10.0f;
 	attacked = false;
 
 	pathfindingOffSet = Vector3(0, 10, 0);
@@ -104,6 +104,11 @@ void Enemy::Chase(float dt)
 	if (attacked)
 		attacked = false;
 
+	Player* p = static_cast<Player*>(&(*player));
+
+	if (p->IsSwimming())
+		return;
+
 	Vector3 playerPos = player->GetTransform().GetWorldPosition();
 	Vector3 pos = transform.GetWorldPosition();
 	playerPos.y = pos.y;
@@ -127,6 +132,7 @@ void Enemy::Attack(float dt)
 
 		gameWorld->RemoveConstraint(c->GetConstraint());
 		c->GetTransform().SetWorldPosition(c->GetOriginalPosition());
+		c->setLayerMask(4);
 
 		p->getCollectables().pop();
 	}

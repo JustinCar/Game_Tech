@@ -19,7 +19,16 @@ namespace NCL {
 
 			Vector3 GetOriginalPosition() { return originalPosition; };
 
+<<<<<<< Updated upstream
 		protected:
+			int GetPoints() { return points; };
+
+=======
+			int GetPoints() { return points; };
+
+		protected:
+
+>>>>>>> Stashed changes
 			PositionConstraint* constraint;
 
 			Vector3 originalPosition;

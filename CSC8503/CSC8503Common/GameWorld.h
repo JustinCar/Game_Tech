@@ -27,6 +27,9 @@ namespace NCL {
 			void AddConstraint(Constraint* c);
 			void RemoveConstraint(Constraint* c);
 
+			void AddCollectable(GameObject* c);
+			void RemoveCollectable(GameObject* c);
+
 			Camera* GetMainCamera() const {
 				return mainCamera;
 			}
@@ -54,7 +57,11 @@ namespace NCL {
 				std::vector<Constraint*>::const_iterator& last) const;
 
 			void increaseScore(int s) { score += s; };
+			int getScore() { return score; };
 
+			void IncrementCollectableCount() { CollectableCount++; };
+			void DecrementCollectableCount() { CollectableCount--; };
+			int GetCollectableCount() { return CollectableCount; };
 		protected:
 			void UpdateTransforms();
 			void UpdateQuadTree();
@@ -62,6 +69,8 @@ namespace NCL {
 			std::vector<GameObject*> gameObjects;
 
 			std::vector<Constraint*> constraints;
+
+			int CollectableCount;
 
 			QuadTree<GameObject*>* quadTree;
 

@@ -21,6 +21,7 @@ namespace NCL {
 
 			bool SendGlobalPacket(int msgID);
 			bool SendGlobalPacket(GamePacket& packet);
+			bool SendPacketToPeer(GamePacket& packet, int ID);
 
 			virtual void UpdateServer();
 

@@ -10,6 +10,7 @@ https://research.ncl.ac.uk/game/
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <string> 
 
 namespace NCL {
 	namespace Maths {
@@ -40,6 +41,11 @@ namespace NCL {
 				Vector3 temp(x, y, z);
 				temp.Normalise();
 				return temp;
+			}
+
+			std::string ToString() 
+			{
+				return "X: " + std::to_string(x) + " Y: " + std::to_string(y) + " Z: " + std::to_string(z);
 			}
 
 			static float Distance(Vector3 a, Vector3 b) {
