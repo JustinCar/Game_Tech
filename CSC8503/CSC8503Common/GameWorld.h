@@ -59,11 +59,24 @@ namespace NCL {
 			void increaseScore(int s) { score += s; };
 			int getScore() { return score; };
 
+			void increasePlayerOneScore(int s) { playerOneScore += s; };
+			void setPlayerOneScore(int s) { playerOneScore = s; };
+			int getPlayerOneScore() { return playerOneScore; };
+
+			void increasePlayerTwoScore(int s) { playerTwoScore += s; };
+			void setPlayerTwoScore(int s) { playerTwoScore = s; };
+			int getPlayerTwoScore() { return playerTwoScore; };
+
 			void IncrementCollectableCount() { CollectableCount++; };
 			void DecrementCollectableCount() { CollectableCount--; };
+			void SetCollectableCount(int c) { CollectableCount = c; };
 			int GetCollectableCount() { return CollectableCount; };
 
 			void SetIsServer(bool b) { isServer = b; };
+			void SetIsNetworkedGame(bool b) { isNetworkedGame = b; };
+
+			bool GetIsServer() { return isServer; };
+			bool GetIsNetworkedGame() { return isNetworkedGame; };
 		protected:
 			void UpdateTransforms();
 			void UpdateQuadTree();
@@ -80,7 +93,11 @@ namespace NCL {
 
 			int score;
 
+			int playerOneScore;
+			int playerTwoScore;
+
 			bool isServer;
+			bool isNetworkedGame;
 
 			bool shuffleConstraints;
 			bool shuffleObjects;

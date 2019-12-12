@@ -14,6 +14,7 @@ GameWorld::GameWorld()	{
 	quadTree = nullptr;
 
 	isServer = false;
+	isNetworkedGame = false;
 
 	shuffleConstraints	= false;
 	shuffleObjects		= false;
@@ -37,6 +38,8 @@ void GameWorld::ClearAndErase() {
 	}
 	Clear();
 	score = 0;
+	playerOneScore = 0;
+	playerTwoScore = 0;
 }
 
 void GameWorld::AddGameObject(GameObject* o) {
@@ -66,13 +69,17 @@ void GameWorld::UpdateWorld(float dt) {
 
 	for (auto& i : gameObjects) {
 		
-		if (isServer && i->GetNetworkObject()->GetID() == 2000)
-			continue;
+		if (isNetworkedGame)
+		{
+			if (isServer && i->GetNetworkObject()->GetID() == 2000)
+				continue;
 
-		if (!isServer && i->GetNetworkObject()->GetID() == 1000)
-			continue;
+			if (!isServer && i->GetNetworkObject()->GetID() == 1000)
+				continue;
 
-		i->Update(dt);
+			i->Update(dt);
+		} else
+			i->Update(dt);
 	}
 
 	if (shuffleObjects) {

@@ -21,8 +21,8 @@ TutorialGame::TutorialGame()	{
 
 	goose = nullptr;
 
-	matchTimer = 0;
-	gameOverScreenCoolDown = 5.0f;
+	matchTimer = -1;
+	gameOverScreenCoolDown = 20.0f;
 
 	buttonSelected = 1;
 	playing = false;
@@ -131,12 +131,14 @@ void TutorialGame::RenderMenu()
 		case 2: playerID = 2000;
 				playing = true;
 				isNetworkedGame = true;
+				world->SetIsNetworkedGame(true);
 				StartGame();
 				return;
 		case 3: playerID = 1000;
 				playing = true;
 				isNetworkedGame = true;
 				world->SetIsServer(true);
+				world->SetIsNetworkedGame(true);
 				isServer = true;
 				StartGame();
 				return;
@@ -197,34 +199,99 @@ void TutorialGame::UpdateGame(float dt) {
 			renderer->DrawString("!!GAMEOVER!!",
 						Vector2(450, 600), Vector4(0, 0, 1, 1));
 
-			renderer->DrawString("FINAL SCORE: " + std::to_string(world->getScore()),
-				Vector2(425, 400), Vector4(0, 0, 1, 1));
+			if (isServer)
+			{
+				renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+					Vector2(425, 400), Vector4(0, 0, 1, 1));
+				renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
+					Vector2(425, 350), Vector4(1, 0, 0, 1));
+			}
+			else
+			{
+				renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
+					Vector2(425, 400), Vector4(1, 0, 0, 1));
+				renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+					Vector2(425, 350), Vector4(0, 0, 1, 1));
+			}
+
+			if (world->getPlayerOneScore() > world->getPlayerTwoScore())
+			{
+				renderer->DrawString("!!BLUE WINS!!",
+					Vector2(425, 300), Vector4(0, 0, 1, 1));
+			}
+			else if (world->getPlayerOneScore() < world->getPlayerTwoScore())
+			{
+				renderer->DrawString("!!RED WINS!!",
+					Vector2(425, 300), Vector4(1, 0, 0, 1));
+			}
+			else
+			{
+				renderer->DrawString("!!DRAW!!",
+					Vector2(425, 300), Vector4(1, 0, 1, 1));
+			}
+
+			renderer->DrawString("TIME TILL NEXT MATCH: " + std::to_string(matchTimer),
+				Vector2(325, 200), Vector4(1, 0, 1, 1));
+			
 			matchTimer -= dt;
 		}
-		else	
+		else if (matchTimer <= 0 && world->getScore() > 0)
+		{
+			physics->Clear();
+			world->ClearAndErase();
+		}
+		else if (!isNetworkedGame)
+		{
 			RenderMenu();
+		}
+		else if (isNetworkedGame)
+		{
+			playing = true;
+			StartGame();
+		}
 	}
-		
 	else
 	{
-		matchTimer -= dt;
 
-		renderer->DrawString("SCORE: " + std::to_string(world->getScore()),
-			Vector2(50, 600), Vector4(0, 0, 1, 1));
+		if (!isNetworkedGame)
+		{
+			matchTimer -= dt;
+			int seconds = matchTimer;
+			renderer->DrawString(std::to_string(seconds / 60) + "." + std::to_string(seconds % 60),
+				Vector2(640, 600), Vector4(0, 0, 1, 1));
 
-		int seconds = matchTimer;
-		renderer->DrawString(std::to_string(seconds / 60) + "." + std::to_string(seconds % 60),
-			Vector2(640, 600), Vector4(0, 0, 1, 1));
+			renderer->DrawString("SCORE: " + std::to_string(world->getScore()),
+						Vector2(50, 600), Vector4(0, 0, 1, 1));
+		}
+		else 
+		{
+			renderer->DrawString("COLLECTABLE COUNT: " + std::to_string(world->GetCollectableCount()),
+				Vector2(300, 300), Vector4(0, 0, 1, 1));
+
+			if (isServer) 
+			{
+				renderer->DrawString("YOUR SCORE: " + std::to_string(world->getPlayerOneScore()),
+					Vector2(50, 600), Vector4(0, 0, 1, 1));
+				renderer->DrawString("THEIR SCORE: " + std::to_string(world->getPlayerTwoScore()),
+					Vector2(50, 550), Vector4(1, 0, 0, 1));
+			}
+			else 
+			{
+				renderer->DrawString("YOUR SCORE: " + std::to_string(world->getPlayerTwoScore()),
+					Vector2(50, 600), Vector4(1, 0, 0, 1));
+				renderer->DrawString("THEIR SCORE: " + std::to_string(world->getPlayerOneScore()),
+					Vector2(50, 550), Vector4(0, 0, 1, 1));
+			}
+		}
 
 		// Gameover
 		if ((matchTimer <= 0) || (world->GetCollectableCount() == 0))
 		{
-			physics->Clear();
-			world->ClearAndErase();
 			playing = false;
 			matchTimer = gameOverScreenCoolDown;
 			ResetCamera();
 		}
+
 	}
 	
 	if (lockedObject != nullptr) {
@@ -569,11 +636,12 @@ void TutorialGame::InitWorld() {
 	//InitMixedGridWorld(10, 10, 3.5f, 3.5f);
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
+	world->IncrementCollectableCount();
 
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
@@ -581,13 +649,13 @@ void TutorialGame::InitWorld() {
 		world->IncrementCollectableCount();
 	}
 
-	for (int i = 0; i < 0; i++)
+	/*for (int i = 0; i < 0; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
 		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
 		world->IncrementCollectableCount();
-	}
+	}*/
 
 	for (int i = 0; i < 6; i++) 
 	{

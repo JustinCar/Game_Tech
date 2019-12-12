@@ -7,6 +7,7 @@ namespace NCL {
 		struct FullPacket : public GamePacket {
 			int		objectID = -1;
 			NetworkState fullState;
+			int score;
 
 			FullPacket() {
 				type = Full_State;
@@ -34,7 +35,18 @@ namespace NCL {
 			ClientPacket() {
 				type = Received_State;
 				size = sizeof(ClientPacket) - sizeof(GamePacket);
-							}
+				
+			}
+		};
+
+		struct CollectableCountPacket : public GamePacket {
+			int count;
+
+			CollectableCountPacket() {
+				type = Collectable_Count;
+				size = sizeof(CollectableCountPacket) - sizeof(GamePacket);
+
+			}
 		};
 
 		class NetworkObject		{
@@ -50,6 +62,8 @@ namespace NCL {
 			void UpdateStateHistory(int minID);
 
 			int GetID() { return networkID; };
+
+			void increaseScore(int s) { playerScore += s; };
 
 		protected:
 
@@ -73,6 +87,8 @@ namespace NCL {
 			int fullErrors;
 
 			int networkID;
+
+			int playerScore;
 		};
 	}
 }

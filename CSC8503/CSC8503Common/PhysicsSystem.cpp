@@ -13,7 +13,7 @@ using namespace NCL;
 using namespace CSC8503;
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
-	applyGravity	= false;
+	applyGravity	= true;
 	useBroadPhase	= true;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.95f;
@@ -277,14 +277,28 @@ void PhysicsSystem::HandleScoreIncrease(GameObject* player)
 	{
 		Collectable* c = static_cast<Collectable*>(&(*p->getCollectables().front()));
 
-		gameWorld.DecrementCollectableCount();
+		if (!gameWorld.GetIsNetworkedGame())
+			gameWorld.increaseScore(c->GetPoints());
+		else 
+		{
+			p->GetNetworkObject()->increaseScore(c->GetPoints());
 
-		gameWorld.increaseScore(c->GetPoints());
+			if (p->GetNetworkObject()->GetID() == 1000)
+				gameWorld.increasePlayerOneScore(c->GetPoints());
+			else
+				gameWorld.increasePlayerTwoScore(c->GetPoints());
+		}
 
 		gameWorld.RemoveConstraint(c->GetConstraint());
-		gameWorld.RemoveGameObject(p->getCollectables().front());
+
+		if (!gameWorld.GetIsNetworkedGame())
+			gameWorld.RemoveGameObject(p->getCollectables().front());
+		else
+			c->GetTransform().SetWorldPosition(Vector3(-1000, -1000, -1000));
 
 		p->getCollectables().pop();
+
+		gameWorld.DecrementCollectableCount();
 	}
 }
 

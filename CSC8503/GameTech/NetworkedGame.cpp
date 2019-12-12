@@ -21,20 +21,20 @@ public:
 
 			packet = realPacket->fullState;
 
-	
-
 			/*if (realPacket->objectID == 1000 ||
 				realPacket->objectID == 2000)
 				return;*/
 
 			if (realPacket->objectID == 1000)
 			{
+				world.setPlayerOneScore(realPacket->score);
 				ghostGoose->GetTransform().SetWorldPosition(packet.position);
 				ghostGoose->GetTransform().SetLocalOrientation(packet.orientation);
 				return;
 			}
 			else if (realPacket->objectID == 2000)
 			{
+				world.setPlayerTwoScore(realPacket->score);
 				controlledGoose->GetTransform().SetWorldPosition(packet.position);
 				//controlledGoose->GetTransform().SetLocalOrientation(packet.orientation);
 				return;
@@ -155,6 +155,23 @@ protected:
 	NetworkedGame& networkedGame;
 };
 
+class CollectableCountReceiver : public PacketReceiver {
+public:
+	CollectableCountReceiver(GameWorld& w) : world(w) {
+
+	}
+
+	void ReceivePacket(int type, GamePacket* payload, int source) {
+		if (type == Collectable_Count) {
+			CollectableCountPacket* realPacket = (CollectableCountPacket*)payload;
+
+			world.SetCollectableCount(realPacket->count);
+		}
+	}
+protected:
+	GameWorld& world;
+};
+
 
 NetworkedGame::NetworkedGame()
 {
@@ -172,20 +189,18 @@ void NetworkedGame::StartAsServer()
 	ClientPacketReceiver* serverReceiver = new ClientPacketReceiver(*world, true, goose, playerTwo);
 	thisServer = new GameServer(port, 2);
 	thisServer->RegisterPacketHandler(Received_State, serverReceiver);
-
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 {
-	FullPacketReceiver* clientReceiver;
-
 	thisClient = new GameClient();
 
-
-	clientReceiver = new FullPacketReceiver(*world, isServer, goose, playerTwo);
+	FullPacketReceiver* clientReceiver = new FullPacketReceiver(*world, isServer, goose, playerTwo);
 	thisClient->RegisterPacketHandler(Full_State, &(*clientReceiver));
 
-	
+	CollectableCountReceiver* countReceiver = new CollectableCountReceiver(*world);
+	thisClient->RegisterPacketHandler(Collectable_Count, &(*countReceiver));
+
 	thisClient->Connect(127, 0, 0, 1, port);
 
 	serverPlayers.insert(std::pair<int, GameObject*>(1, (GameObject*)goose));
@@ -308,6 +323,13 @@ void NetworkedGame::UpdateAsServer(float dt)
 {
 	thisServer->UpdateServer();
 	BroadcastSnapshot(false);
+
+	CollectableCountPacket* packet = new CollectableCountPacket();
+	packet->count = world->GetCollectableCount();
+
+	thisServer->SendPacketToPeer(*packet, 2);
+	delete packet;
+
 }
 
 void NetworkedGame::UpdateAsClient(float dt) {

@@ -65,6 +65,8 @@ namespace NCL {
 			GameObject* playerTwo;
 			vector<Enemy*> enemies;
 
+			int secondPlayerScore;
+
 			void RenderMenu();
 			int buttonSelected;
 			bool playing;

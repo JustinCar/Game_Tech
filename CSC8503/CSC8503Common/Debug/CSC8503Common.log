@@ -1,7 +1,5 @@
-﻿  GameServer.cpp
-  GameWorld.cpp
-  PhysicsObject.cpp
-  PhysicsSystem.cpp
+﻿  GameObject.cpp
+  GameServer.cpp
+  PositionConstraint.cpp
   Generating Code...
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\CSC8503Common\PhysicsSystem.cpp(276,20): warning C4018:  '<': signed/unsigned mismatch
   CSC8503Common.vcxproj -> C:\Users\b6038386\Documents\GitHub\Game_Tech\Win32\Debug\CSC8503Common.lib
