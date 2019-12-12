@@ -7,15 +7,38 @@
 
 class FullPacketReceiver : public PacketReceiver {
 public:
-	FullPacketReceiver(GameWorld& w, bool p) : world(w), isPlayerServer(p) {
+	FullPacketReceiver(GameWorld& w, bool p, GameObject* controlled, GameObject* ghost) : world(w), isPlayerServer(p), controlledGoose(controlled), ghostGoose(ghost) {
 
 	}
 
 	void ReceivePacket(int type, GamePacket* payload, int source) {
+
+		if (isPlayerServer)
+			return;
+
 		if (type == Full_State) {
 			FullPacket* realPacket = (FullPacket*)payload;
 
 			packet = realPacket->fullState;
+
+	
+
+			/*if (realPacket->objectID == 1000 ||
+				realPacket->objectID == 2000)
+				return;*/
+
+			if (realPacket->objectID == 1000)
+			{
+				ghostGoose->GetTransform().SetWorldPosition(packet.position);
+				ghostGoose->GetTransform().SetLocalOrientation(packet.orientation);
+				return;
+			}
+			else if (realPacket->objectID == 2000)
+			{
+				controlledGoose->GetTransform().SetWorldPosition(packet.position);
+				//controlledGoose->GetTransform().SetLocalOrientation(packet.orientation);
+				return;
+			}
 			
 			std::vector <GameObject*>::const_iterator first;
 			std::vector <GameObject*>::const_iterator last;
@@ -27,18 +50,20 @@ public:
 			std::cout << "Full Packet Received..." << std::endl;
 
 			(*first)->GetTransform().SetWorldPosition(packet.position);
-			(*first)->GetTransform().SetWorldOrientation(packet.orientation);
+			(*first)->GetTransform().SetLocalOrientation(packet.orientation);
 		}
 	}
 protected:
 	GameWorld& world;
 	NetworkState packet;
 	bool isPlayerServer;
+	GameObject* controlledGoose;
+	GameObject* ghostGoose;
 };
 
 class ClientPacketReceiver : public PacketReceiver {
 public:
-	ClientPacketReceiver(GameWorld& w) : world(w) {
+	ClientPacketReceiver(GameWorld& w, bool p, GameObject* controlled, GameObject* ghost) : world(w), isPlayerServer(p), controlledGoose(controlled), ghostGoose(ghost) {
 
 	}
 
@@ -47,20 +72,69 @@ public:
 			ClientPacket* realPacket = (ClientPacket*)payload;
 			//packet = realPacket->fullState;
 
-			std::vector <GameObject*>::const_iterator first;
-			std::vector <GameObject*>::const_iterator last;
+			GameObject* object = nullptr;
 
-			world.GetObjectIterators(first, last);
+			if (realPacket->objectID == 1000 && isPlayerServer)
+				object = controlledGoose;
+			else if (realPacket->objectID == 1000 && !isPlayerServer)
+				object = ghostGoose;
 
-			first += packet.stateID;
+			if (realPacket->objectID == 2000 && isPlayerServer)
+				object = ghostGoose;
+			else if (realPacket->objectID == 2000 && !isPlayerServer)
+				object = controlledGoose;
 
-			(*first)->GetTransform().SetWorldPosition(packet.position);
-			(*first)->GetTransform().SetWorldOrientation(packet.orientation);
+			object->GetTransform().SetLocalOrientation(realPacket->orientation);
+
+			Vector4 z = object->GetTransform().GetWorldMatrix().GetColumn(2);
+
+			Vector3 forward = Vector3(z.x, z.y, z.z);
+
+			Vector4 x = object->GetTransform().GetWorldMatrix().GetColumn(0);
+
+			Vector3 right = Vector3(x.x, x.y, x.z);
+
+			/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE) && jumpTimer <= 0) {
+				jumpTimer = jumpCoolDown;
+				physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
+			}
+
+			if (isSwimming)
+			{
+				swimTimer -= dt;
+				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W) && swimTimer <= 0) {
+					swimTimer = swimCoolDown;
+					physicsObject->AddForce(forward * swimPower);
+				}
+			}*/
+			float speed = 500;
+
+			if (realPacket->buttonstates[0]) {
+				object->GetPhysicsObject()->AddForce(forward * speed);
+			}
+
+			if (realPacket->buttonstates[1]) {
+				object->GetPhysicsObject()->AddForce(-forward * speed);
+			}
+
+			if (realPacket->buttonstates[2]) {
+				object->GetPhysicsObject()->AddForce(right * speed);
+
+			}
+
+			if (realPacket->buttonstates[3]) {
+				object->GetPhysicsObject()->AddForce(-right * speed);
+			}
+
+			
 		}
 	}
 protected:
 	GameWorld& world;
 	NetworkState packet;
+	bool isPlayerServer;
+	GameObject* controlledGoose;
+	GameObject* ghostGoose;
 };
 
 class ConnectedPacketReceiver : public PacketReceiver {
@@ -95,9 +169,9 @@ NetworkedGame::~NetworkedGame()
 
 void NetworkedGame::StartAsServer()
 {
-	ClientPacketReceiver* serverReceiver = new ClientPacketReceiver(*world);
+	ClientPacketReceiver* serverReceiver = new ClientPacketReceiver(*world, true, goose, playerTwo);
 	thisServer = new GameServer(port, 2);
-	thisServer->RegisterPacketHandler(Received_State, &(*serverReceiver));
+	thisServer->RegisterPacketHandler(Received_State, serverReceiver);
 
 }
 
@@ -107,11 +181,10 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d)
 
 	thisClient = new GameClient();
 
-	if (!isServer)
-	{
-		clientReceiver = new FullPacketReceiver(*world, true);
-		thisClient->RegisterPacketHandler(Full_State, &(*clientReceiver));
-	}
+
+	clientReceiver = new FullPacketReceiver(*world, isServer, goose, playerTwo);
+	thisClient->RegisterPacketHandler(Full_State, &(*clientReceiver));
+
 	
 	thisClient->Connect(127, 0, 0, 1, port);
 
@@ -122,6 +195,9 @@ void NetworkedGame::UpdateGame(float dt)
 {
 	
 	TutorialGame::UpdateGame(dt);
+
+	if (playerTwo && serverPlayers.size() == 1)
+		serverPlayers.insert(std::pair<int, GameObject*>(2, (GameObject*)playerTwo));
 
 	if (!isNetworkedGame)
 		return;
@@ -142,9 +218,7 @@ void NetworkedGame::UpdateGame(float dt)
 void NetworkedGame::SpawnPlayer()
 {
 	float size = 1.0f;
-	float inverseMass = 0.1f;
-
-	GameObject* secondPlayer = new GameObject();
+	Player* secondPlayer = new Player(0);
 
 	SphereVolume* volume = new SphereVolume(size);
 	secondPlayer->SetBoundingVolume((CollisionVolume*)volume);
@@ -152,23 +226,10 @@ void NetworkedGame::SpawnPlayer()
 	secondPlayer->GetTransform().SetWorldScale(Vector3(size, size, size));
 	secondPlayer->GetTransform().SetWorldPosition(Vector3(270, 10, 190));
 
-	secondPlayer->SetRenderObject(new RenderObject(&secondPlayer->GetTransform(), gooseMesh, nullptr, basicShader));
-	secondPlayer->SetPhysicsObject(new PhysicsObject(&secondPlayer->GetTransform(), secondPlayer->GetBoundingVolume()));
+	secondPlayer->setLayer(2);
+	secondPlayer->setLayerMask(0);
 
-	secondPlayer->GetPhysicsObject()->SetInverseMass(inverseMass);
-	secondPlayer->GetPhysicsObject()->InitSphereInertia();
-
-	int id;
-	if (playerID == 1000)
-		id = 2000;
-	else
-		id = 1000;
-
-	NetworkObject* o = new NetworkObject(*secondPlayer, id);
-
-	secondPlayer->SetNetworkObject(o);
-
-	world->AddGameObject(secondPlayer);
+	playerTwo = secondPlayer;
 
 	serverPlayers.insert(std::pair<int, GameObject*>(2, (GameObject*)secondPlayer));
 }
@@ -180,6 +241,61 @@ void NetworkedGame::StartLevel()
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
+	ClientPacket* realPacket = (ClientPacket*)payload;
+
+	GameObject* object = nullptr;
+
+	if (realPacket->objectID == 1000 && isServer)
+		object = goose;
+	else if (realPacket->objectID == 1000 && !isServer)
+		object = playerTwo;
+
+	if (realPacket->objectID == 2000 && isServer)
+		object = playerTwo;
+	else if (realPacket->objectID == 2000 && !isServer)
+		object = goose;
+
+	object->GetTransform().SetLocalOrientation(realPacket->orientation);
+
+	Vector4 z = object->GetTransform().GetWorldMatrix().GetColumn(2);
+
+	Vector3 forward = Vector3(z.x, z.y, z.z);
+
+	Vector4 x = object->GetTransform().GetWorldMatrix().GetColumn(0);
+
+	Vector3 right = Vector3(x.x, x.y, x.z);
+
+	/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE) && jumpTimer <= 0) {
+		jumpTimer = jumpCoolDown;
+		physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
+	}
+
+	if (isSwimming)
+	{
+		swimTimer -= dt;
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W) && swimTimer <= 0) {
+			swimTimer = swimCoolDown;
+			physicsObject->AddForce(forward * swimPower);
+		}
+	}*/
+	float speed = 500;
+
+	if (realPacket->buttonstates[0]) {
+		object->GetPhysicsObject()->AddForce(forward * speed);
+	}
+
+	if (realPacket->buttonstates[1]) {
+		object->GetPhysicsObject()->AddForce(-forward * speed);
+	}
+
+	if (realPacket->buttonstates[2]) {
+		object->GetPhysicsObject()->AddForce(right * speed);
+
+	}
+
+	if (realPacket->buttonstates[3]) {
+		object->GetPhysicsObject()->AddForce(-right * speed);
+	}
 
 }
 
@@ -197,13 +313,62 @@ void NetworkedGame::UpdateAsServer(float dt)
 void NetworkedGame::UpdateAsClient(float dt) {
 	thisClient->UpdateClient();
 
+	if (isServer)
+		return;
+
 	ClientPacket newPacket;
-	
-	if (Window::GetKeyboard() -> KeyPressed(KeyboardKeys::SPACE)) {
-		// fire button pressed !
-		newPacket.buttonstates[0] = 1;
-		newPacket.lastID = 0; // You ’ll need to work this out somehow ...
+
+	for (int i = 0; i < 5; i++) 
+	{
+		newPacket.buttonstates[i] = false;
 	}
+
+	newPacket.orientation = goose->GetTransform().GetLocalOrientation();
+
+	if (isServer)
+	{
+		newPacket.objectID = 1000;
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W)) {
+			newPacket.buttonstates[0] = true;
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::S)) {
+			newPacket.buttonstates[1] = true;
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::A)) {
+			newPacket.buttonstates[2] = true;
+
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::D)) {
+			newPacket.buttonstates[3] = true;
+		}
+	}
+	else
+	{
+		newPacket.objectID = 2000;
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::U)) {
+			newPacket.buttonstates[0] = true;
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::J)) {
+			newPacket.buttonstates[1] = true;
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::H)) {
+			newPacket.buttonstates[2] = true;
+
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::K)) {
+			newPacket.buttonstates[3] = true;
+		}
+	}
+	
+
 	thisClient -> SendPacket(newPacket);
 }
 

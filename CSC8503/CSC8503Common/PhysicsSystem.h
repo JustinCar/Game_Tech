@@ -24,6 +24,7 @@ namespace NCL {
 			}
 
 			void SetGravity(const Vector3& g);
+			void SetIsServer(bool b) { isServer = b; };
 		protected:
 			void BasicCollisionDetection();
 			void BroadPhase();
@@ -53,6 +54,8 @@ namespace NCL {
 			float	dTOffset;
 			float	globalDamping;
 			float	frameDT;
+
+			bool isServer;
 
 			std::set<CollisionDetection::CollisionInfo> allCollisions;
 			std::set<CollisionDetection::CollisionInfo>		broadphaseCollisions;

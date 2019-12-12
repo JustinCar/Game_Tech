@@ -27,6 +27,8 @@ TutorialGame::TutorialGame()	{
 	buttonSelected = 1;
 	playing = false;
 
+	playerID = 0;
+
 	isNetworkedGame = false;
 	isServer = false;
 
@@ -94,7 +96,12 @@ void TutorialGame::StartGame()
 
 	for (auto i = first; i != last; ++i) 
 	{
-
+		/*if ((*i)->getLayer() == 2)
+		{
+			(*i)->SetNetworkObject(new NetworkObject(*(*i), playerID));
+			continue;
+		}*/
+		
 		if (!(*i)->GetNetworkObject())
 			(*i)->SetNetworkObject(new NetworkObject(*(*i), counter));
 		counter++;
@@ -118,18 +125,20 @@ void TutorialGame::RenderMenu()
 		switch (buttonSelected)
 		{
 		case 1: playing = true;
-				StartGame();
-				return;
-		case 2: playing = true;
-				StartGame();
-				isNetworkedGame = true;
-				playerID = 2000;
-				return;
-		case 3: playing = true;
-				StartGame();
-				isNetworkedGame = true;
 				playerID = 1000;
+				StartGame();
+				return;
+		case 2: playerID = 2000;
+				playing = true;
+				isNetworkedGame = true;
+				StartGame();
+				return;
+		case 3: playerID = 1000;
+				playing = true;
+				isNetworkedGame = true;
+				world->SetIsServer(true);
 				isServer = true;
+				StartGame();
 				return;
 		case 4: exit(0);
 		}
@@ -272,7 +281,9 @@ void TutorialGame::UpdateGame(float dt) {
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 
-	if(isServer)
+	if (!isNetworkedGame)
+		physics->Update(dt);
+	else if (isServer && isNetworkedGame)
 		physics->Update(dt);
 
 	Debug::FlushRenderables();
@@ -559,6 +570,9 @@ void TutorialGame::InitWorld() {
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
+	if (isNetworkedGame)
+		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
+
 	for (int i = 0; i < 1; i++)
 	{
 		int xPos = rand() % 480;
@@ -817,7 +831,9 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	float size			= 1.0f;
 	float inverseMass	= 0.1f;
 
-	goose = new Player();
+	goose = new Player(playerID);
+
+	Vector3 offSet(5, 0, 5);
 
 	goose->setCamera(world->GetMainCamera());
 
@@ -825,7 +841,11 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	goose->SetBoundingVolume((CollisionVolume*)volume);
 
 	goose->GetTransform().SetWorldScale(Vector3(size,size,size) );
-	goose->GetTransform().SetWorldPosition(position);
+
+	if (playerID == 1000)
+		goose->GetTransform().SetWorldPosition(position + offSet);
+	else 
+		goose->GetTransform().SetWorldPosition(position - offSet);
 
 	goose->SetRenderObject(new RenderObject(&goose->GetTransform(), gooseMesh, nullptr, basicShader));
 	goose->SetPhysicsObject(new PhysicsObject(&goose->GetTransform(), goose->GetBoundingVolume()));
@@ -833,11 +853,49 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	goose->GetPhysicsObject()->SetInverseMass(inverseMass);
 	goose->GetPhysicsObject()->InitSphereInertia();
 
+	if (playerID == 1000)
+	{
+		goose->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+	}
+	else
+	{
+		goose->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
+	}
+
 	goose->SetNetworkObject(new NetworkObject(*goose, playerID));
 
 	world->AddGameObject(goose);
 
 	return goose;
+}
+
+GameObject* TutorialGame::AddPlayerTwoToWorld(const Vector3& position)
+{
+	float inverseMass = 0.1f;
+
+	playerTwo->SetRenderObject(new RenderObject(&playerTwo->GetTransform(), gooseMesh, nullptr, basicShader));
+	playerTwo->SetPhysicsObject(new PhysicsObject(&playerTwo->GetTransform(), playerTwo->GetBoundingVolume()));
+
+	playerTwo->GetPhysicsObject()->SetInverseMass(inverseMass);
+	playerTwo->GetPhysicsObject()->InitSphereInertia();
+
+	int id;
+	if (playerID == 1000)
+	{
+		id = 2000;
+		playerTwo->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
+	}
+	else 
+	{
+		id = 1000;
+		playerTwo->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+	}
+		
+	playerTwo->SetNetworkObject(new NetworkObject(*playerTwo, id));
+
+	world->AddGameObject(playerTwo);
+
+	return playerTwo;
 }
 
 Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
