@@ -18,7 +18,7 @@ namespace NCL {
 		class Enemy : public GameObject
 		{
 		public:
-			Enemy(Vector3 position, GameWorld* world);
+			Enemy(Vector3 position, GameWorld* world, bool& isServer);
 			~Enemy();
 			//void UpdateEnemy(float dt);
 			virtual void Update(float dt);
@@ -70,6 +70,8 @@ namespace NCL {
 			float chaseRadius;
 			float attackRadius;
 			bool attacked;
+
+			bool& isServerEnemy;
 
 			GameObject* player;
 

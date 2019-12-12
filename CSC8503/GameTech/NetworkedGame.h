@@ -25,6 +25,8 @@ namespace NCL {
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
+			std::map<int, GameObject*> GetServerPlayers() { return serverPlayers; };
+
 		protected:
 			void UpdateAsServer(float dt);
 			void UpdateAsClient(float dt);
@@ -38,6 +40,8 @@ namespace NCL {
 			float timeToNextPacket;
 			int packetsToSnapshot;
 
+			int port;
+			
 			std::vector<NetworkObject*> networkObjects;
 
 			std::map<int, GameObject*> serverPlayers;

@@ -27,12 +27,14 @@ namespace NCL {
 		};
 
 		struct ClientPacket : public GamePacket {
-			int		lastID;
-			char	buttonstates[8];
+			int		objectID = -1;
+			bool buttonstates[5];
+			Quaternion	orientation;
 
 			ClientPacket() {
-				size = sizeof(ClientPacket);
-			}
+				type = Received_State;
+				size = sizeof(ClientPacket) - sizeof(GamePacket);
+							}
 		};
 
 		class NetworkObject		{
@@ -46,6 +48,8 @@ namespace NCL {
 			virtual bool WritePacket(GamePacket** p, bool deltaFrame, int stateID);
 
 			void UpdateStateHistory(int minID);
+
+			int GetID() { return networkID; };
 
 		protected:
 

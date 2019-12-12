@@ -82,6 +82,8 @@ void PhysicsSystem::Update(float dt) {
 
 	while(dTOffset > iterationDt * 0.5) {
 		IntegrateAccel(iterationDt); //Update accelerations from external forces
+
+
 		if (useBroadPhase) {
 			BroadPhase();
 			NarrowPhase();
@@ -98,7 +100,7 @@ void PhysicsSystem::Update(float dt) {
 		for (int i = 0; i < constraintIterationCount; ++i) {
 			UpdateConstraints(constraintDt);	
 		}
-		
+
 		IntegrateVelocity(iterationDt); //update positions from new velocity changes
 
 		dTOffset -= iterationDt; 
@@ -106,6 +108,7 @@ void PhysicsSystem::Update(float dt) {
 	ClearForces();	//Once we've finished with the forces, reset them to zero
 
 	UpdateCollisionList(); //Remove any old collisions
+
 	//std::cout << iteratorCount << " , " << iterationDt << std::endl;
 	float time = testTimer.GetTimeDeltaSeconds();
 	//std::cout << "Physics time taken: " << time << std::endl;
@@ -406,6 +409,10 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 			continue; // No physics object for this GameObject !
 			
 		}
+
+		if ((*i)->getLayer() == 2)
+			int i = 0;
+
 		float inverseMass = object -> GetInverseMass();
 		
 		Vector3 linearVel = object -> GetLinearVelocity();

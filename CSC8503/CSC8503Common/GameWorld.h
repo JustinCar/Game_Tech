@@ -62,6 +62,8 @@ namespace NCL {
 			void IncrementCollectableCount() { CollectableCount++; };
 			void DecrementCollectableCount() { CollectableCount--; };
 			int GetCollectableCount() { return CollectableCount; };
+
+			void SetIsServer(bool b) { isServer = b; };
 		protected:
 			void UpdateTransforms();
 			void UpdateQuadTree();
@@ -77,6 +79,8 @@ namespace NCL {
 			Camera* mainCamera;
 
 			int score;
+
+			bool isServer;
 
 			bool shuffleConstraints;
 			bool shuffleObjects;

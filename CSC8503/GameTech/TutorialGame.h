@@ -55,18 +55,24 @@ namespace NCL {
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			//IT'S HAPPENING
 			GameObject* AddGooseToWorld(const Vector3& position);
+			GameObject* AddPlayerTwoToWorld(const Vector3& position);
 			Enemy*		AddParkKeeperToWorld(const Vector3& position);
 			GameObject* AddCharacterToWorld(const Vector3& position);
 			GameObject* AddAppleToWorld(const Vector3& position);
 			GameObject* AddBonusItemToWorld(const Vector3& position);
 
 			Player* goose;
+			GameObject* playerTwo;
 			vector<Enemy*> enemies;
 
 			void RenderMenu();
-			bool playButtonSelected;
+			int buttonSelected;
 			bool playing;
 			void StartGame();
+
+			bool isNetworkedGame;
+			bool isServer;
+			int playerID;
 
 			float matchTimer;
 			float gameOverScreenCoolDown;

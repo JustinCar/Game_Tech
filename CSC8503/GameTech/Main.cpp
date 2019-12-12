@@ -49,7 +49,7 @@ void TestNetworking() {
 	
 	server -> RegisterPacketHandler(String_Message, &serverReceiver);
 	client -> RegisterPacketHandler(String_Message, &clientReceiver);
-	client2->RegisterPacketHandler(String_Message, &clientReceiver2);
+	client2 -> RegisterPacketHandler(String_Message, &clientReceiver2);
 	
 	bool canConnect = client -> Connect(127, 0, 0, 1, port);
 	bool canConnect2 = client2->Connect(127, 0, 0, 1, port);
@@ -175,12 +175,14 @@ int main() {
 	//TestStateMachine();
 	//TestNetworking();
 	//TestPathfinding();
-	TestNetworking();
+	//TestNetworking();
 	
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	TutorialGame* g = new TutorialGame();
+	NetworkedGame* g = new NetworkedGame();
+
+	NetworkBase::Initialise();
 
 	//TestStateMachine();
 

@@ -25,6 +25,8 @@ namespace NCL {
 
 			virtual void UpdateServer();
 
+			bool SecondPlayerEntered() { return HasSecondPlayer; };
+
 		protected:
 			int			port;
 			int			clientMax;
@@ -33,7 +35,7 @@ namespace NCL {
 
 			//std::atomic<bool> threadAlive;
 
-			
+			bool HasSecondPlayer;
 
 			//std::thread updateThread;
 

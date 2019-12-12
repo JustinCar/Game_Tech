@@ -12,7 +12,7 @@ namespace NCL {
 		class Player : public GameObject
 		{
 		public:
-			Player();
+			Player(int id);
 			~Player();
 			//void UpdatePlayer(float dt);
 			virtual void Update(float dt);
@@ -31,7 +31,8 @@ namespace NCL {
 			bool IsSwimming() { return isSwimming; };
 			
 		protected:
-			void UpdateKeys(float dt);
+			void UpdateServerPlayerKeys(float dt);
+			void UpdateClientPlayerKeys(float dt);
 			void UpdateCamera(float dt);
 			float speed;
 
@@ -45,6 +46,8 @@ namespace NCL {
 			float jumpPower;
 			float jumpTimer;
 			float jumpCoolDown;
+
+			int playerID;
 
 			std::queue<GameObject*> collectables;
 		};

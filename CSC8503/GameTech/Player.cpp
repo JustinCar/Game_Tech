@@ -3,7 +3,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-Player::Player() : GameObject("PLAYER") 
+Player::Player(int id) : GameObject("PLAYER")
 {
 	speed = 500;
 	camOffset = Vector3(0, 15, -10);
@@ -12,6 +12,8 @@ Player::Player() : GameObject("PLAYER")
 	jumpPower = 10000;
 	jumpCoolDown = 2;
 	jumpTimer = 2;
+
+	playerID = id;
 
 	swimPower = 10000;
 	swimTimer = 1;
@@ -29,7 +31,11 @@ Player::~Player()
 
 void Player::Update(float dt)
 {
-	UpdateKeys(dt);
+	if (playerID == 1000)
+		UpdateServerPlayerKeys(dt);
+	else
+		UpdateClientPlayerKeys(dt);
+
 	UpdateCamera(dt);
 }
 
@@ -63,7 +69,7 @@ void Player::UpdateCamera(float dt)
 	mainCamera->SetYaw(angles.y);
 }
 
-void Player::UpdateKeys(float dt)
+void Player::UpdateServerPlayerKeys(float dt)
 {
 	yaw -= (Window::GetMouse()->GetRelativePosition().x);
 	jumpTimer -= dt;
@@ -113,6 +119,60 @@ void Player::UpdateKeys(float dt)
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::D) && !isSwimming) {
+		physicsObject->AddForce(-right * speed);
+	}
+}
+
+void Player::UpdateClientPlayerKeys(float dt)
+{
+	yaw -= (Window::GetMouse()->GetRelativePosition().x);
+	jumpTimer -= dt;
+
+	if (yaw < 0) {
+		yaw += 360.0f;
+	}
+	if (yaw > 360.0f) {
+		yaw -= 360.0f;
+	}
+
+	transform.SetLocalOrientation(Quaternion::EulerAnglesToQuaternion(0, yaw, 0));
+
+	Vector4 z = transform.GetWorldMatrix().GetColumn(2);
+
+	Vector3 forward = Vector3(z.x, z.y, z.z);
+
+	Vector4 x = transform.GetWorldMatrix().GetColumn(0);
+
+	Vector3 right = Vector3(x.x, x.y, x.z);
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RETURN) && jumpTimer <= 0) {
+		jumpTimer = jumpCoolDown;
+		physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
+	}
+
+	if (isSwimming)
+	{
+		swimTimer -= dt;
+		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::U) && swimTimer <= 0) {
+			swimTimer = swimCoolDown;
+			physicsObject->AddForce(forward * swimPower);
+		}
+	}
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::U) && !isSwimming) {
+		physicsObject->AddForce(forward * speed);
+	}
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::J) && !isSwimming) {
+		physicsObject->AddForce(-forward * speed);
+	}
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::H) && !isSwimming) {
+		physicsObject->AddForce(right * speed);
+
+	}
+
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::K) && !isSwimming) {
 		physicsObject->AddForce(-right * speed);
 	}
 }

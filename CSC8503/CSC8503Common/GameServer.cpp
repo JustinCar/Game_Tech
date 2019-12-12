@@ -11,6 +11,7 @@ GameServer::GameServer(int onPort, int maxClients)	{
 	clientCount = 0;
 	netHandle	= nullptr;
 	//threadAlive = false;
+	HasSecondPlayer = false;
 
 	Initialise();
 }
@@ -62,10 +63,12 @@ bool GameServer::SendGlobalPacket(GamePacket& packet) {
 bool GameServer::SendPacketToPeer(GamePacket& packet, int id) {
 	ENetPacket* dataPacket = enet_packet_create(&packet, packet.GetTotalSize(), 0);
 
-	if (id == 1)
+
+	if (id == 1 && playerOne)
 		enet_peer_send(playerOne, 0, dataPacket);
-	else if (id == 2)
+	else if (id == 2 && playerTwo)
 		enet_peer_send(playerTwo, 0, dataPacket);
+	
 	
 	return true;
 }
@@ -94,6 +97,7 @@ void GameServer::UpdateServer() {
 			}
 			else if (!playerTwo)
 			{
+				HasSecondPlayer = true;
 				playerTwo = p;
 				players.insert(std::pair<int, ENetPeer*>(2, playerTwo));
 			}
@@ -111,6 +115,7 @@ void GameServer::UpdateServer() {
 			}
 			else if (playerTwo == p)
 			{
+				HasSecondPlayer = false;
 				playerTwo = nullptr;
 				players.erase(players.begin(), players.find(2));
 			}

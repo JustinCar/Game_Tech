@@ -24,8 +24,13 @@ TutorialGame::TutorialGame()	{
 	matchTimer = 0;
 	gameOverScreenCoolDown = 5.0f;
 
-	playButtonSelected = true;
+	buttonSelected = 1;
 	playing = false;
+
+	playerID = 0;
+
+	isNetworkedGame = false;
+	isServer = false;
 
 	Debug::SetRenderer(renderer);
 
@@ -81,45 +86,102 @@ void TutorialGame::StartGame()
 	matchTimer = 180.0f;
 	InitCamera();
 	InitWorld();
+
+	std::vector < GameObject* >::const_iterator first;
+	std::vector < GameObject* >::const_iterator last;
+
+	world->GetObjectIterators(first, last);
+
+	int counter = 0;
+
+	for (auto i = first; i != last; ++i) 
+	{
+		/*if ((*i)->getLayer() == 2)
+		{
+			(*i)->SetNetworkObject(new NetworkObject(*(*i), playerID));
+			continue;
+		}*/
+		
+		if (!(*i)->GetNetworkObject())
+			(*i)->SetNetworkObject(new NetworkObject(*(*i), counter));
+		counter++;
+	}
 }
 
 void TutorialGame::RenderMenu()
 {
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN) && playButtonSelected) {
-		playButtonSelected = false;
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN) && buttonSelected != 4) {
+
+		buttonSelected++;
 	}
 
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP) && !playButtonSelected) {
-		playButtonSelected = true;
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP) && buttonSelected != 1) {
+
+		buttonSelected--;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::RETURN)) {
-		if (playButtonSelected)
+
+		switch (buttonSelected)
 		{
-			playing = true;
-			StartGame();
-		}	
-
-		if (!playButtonSelected)
-			exit(0);
+		case 1: playing = true;
+				playerID = 1000;
+				StartGame();
+				return;
+		case 2: playerID = 2000;
+				playing = true;
+				isNetworkedGame = true;
+				StartGame();
+				return;
+		case 3: playerID = 1000;
+				playing = true;
+				isNetworkedGame = true;
+				world->SetIsServer(true);
+				isServer = true;
+				StartGame();
+				return;
+		case 4: exit(0);
+		}
 	}
 
-	if (playButtonSelected)
+	switch (buttonSelected) 
 	{
-		renderer->DrawString("Play",
-					Vector2(640, 600), Vector4(0, 0, 1, 1));
+	case 1 : renderer->DrawString("Play Singleplayer",
+					Vector2(40, 600), Vector4(0, 0, 1, 1));
+			renderer->DrawString("Play Multiplayer",
+						Vector2(40, 500));
+			renderer->DrawString("Play Multiplayer as Server",
+				Vector2(40, 400));
+			renderer->DrawString("Exit",
+				Vector2(40, 300));
+			
+	case 2 : renderer->DrawString("Play Singleplayer",
+				Vector2(40, 600));
+			renderer->DrawString("Play Multiplayer",
+				Vector2(40, 500), Vector4(0, 0, 1, 1));
+			renderer->DrawString("Play Multiplayer as Server",
+				Vector2(40, 400));
+			renderer->DrawString("Exit",
+				Vector2(40, 300));
 
-		renderer->DrawString("Exit",
-			Vector2(640, 400));
-	} else 
-	{
-		renderer->DrawString("Play",
-			Vector2(640, 600));
-
-		renderer->DrawString("Exit",
-			Vector2(640, 400), Vector4(0, 0, 1, 1));
+	case 3 : renderer->DrawString("Play Singleplayer",
+				Vector2(40, 600));
+			renderer->DrawString("Play Multiplayer",
+				Vector2(40, 500));
+			renderer->DrawString("Play Multiplayer as Server",
+				Vector2(40, 400), Vector4(0, 0, 1, 1));
+			renderer->DrawString("Exit",
+				Vector2(40, 300));
+	case 4: renderer->DrawString("Play Singleplayer",
+			Vector2(40, 600));
+			renderer->DrawString("Play Multiplayer",
+				Vector2(40, 500));
+			renderer->DrawString("Play Multiplayer as Server",
+				Vector2(40, 400));
+			renderer->DrawString("Exit",
+				Vector2(40, 300), Vector4(0, 0, 1, 1));
+	
 	}
-		
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -127,8 +189,6 @@ void TutorialGame::UpdateGame(float dt) {
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
-	if (!playing)
-		RenderMenu();
 
 	if (!playing)
 	{
@@ -220,7 +280,11 @@ void TutorialGame::UpdateGame(float dt) {
 
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
-	physics->Update(dt);
+
+	if (!isNetworkedGame)
+		physics->Update(dt);
+	else if (isServer && isNetworkedGame)
+		physics->Update(dt);
 
 	Debug::FlushRenderables();
 	renderer->Render();
@@ -506,6 +570,9 @@ void TutorialGame::InitWorld() {
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
+	if (isNetworkedGame)
+		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
+
 	for (int i = 0; i < 1; i++)
 	{
 		int xPos = rand() % 480;
@@ -764,7 +831,9 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	float size			= 1.0f;
 	float inverseMass	= 0.1f;
 
-	goose = new Player();
+	goose = new Player(playerID);
+
+	Vector3 offSet(5, 0, 5);
 
 	goose->setCamera(world->GetMainCamera());
 
@@ -772,7 +841,11 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	goose->SetBoundingVolume((CollisionVolume*)volume);
 
 	goose->GetTransform().SetWorldScale(Vector3(size,size,size) );
-	goose->GetTransform().SetWorldPosition(position);
+
+	if (playerID == 1000)
+		goose->GetTransform().SetWorldPosition(position + offSet);
+	else 
+		goose->GetTransform().SetWorldPosition(position - offSet);
 
 	goose->SetRenderObject(new RenderObject(&goose->GetTransform(), gooseMesh, nullptr, basicShader));
 	goose->SetPhysicsObject(new PhysicsObject(&goose->GetTransform(), goose->GetBoundingVolume()));
@@ -780,9 +853,49 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	goose->GetPhysicsObject()->SetInverseMass(inverseMass);
 	goose->GetPhysicsObject()->InitSphereInertia();
 
+	if (playerID == 1000)
+	{
+		goose->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+	}
+	else
+	{
+		goose->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
+	}
+
+	goose->SetNetworkObject(new NetworkObject(*goose, playerID));
+
 	world->AddGameObject(goose);
 
 	return goose;
+}
+
+GameObject* TutorialGame::AddPlayerTwoToWorld(const Vector3& position)
+{
+	float inverseMass = 0.1f;
+
+	playerTwo->SetRenderObject(new RenderObject(&playerTwo->GetTransform(), gooseMesh, nullptr, basicShader));
+	playerTwo->SetPhysicsObject(new PhysicsObject(&playerTwo->GetTransform(), playerTwo->GetBoundingVolume()));
+
+	playerTwo->GetPhysicsObject()->SetInverseMass(inverseMass);
+	playerTwo->GetPhysicsObject()->InitSphereInertia();
+
+	int id;
+	if (playerID == 1000)
+	{
+		id = 2000;
+		playerTwo->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
+	}
+	else 
+	{
+		id = 1000;
+		playerTwo->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+	}
+		
+	playerTwo->SetNetworkObject(new NetworkObject(*playerTwo, id));
+
+	world->AddGameObject(playerTwo);
+
+	return playerTwo;
 }
 
 Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
@@ -790,11 +903,9 @@ Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	float meshSize = 4.0f;
 	float inverseMass = 0.5f;
 
-	Enemy* keeper = new Enemy(position, world);
+	Enemy* keeper = new Enemy(position, world, isServer);
 
 	keeper->setPlayer(goose);
-
-
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -809,6 +920,7 @@ Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	world->AddGameObject(keeper);
 
 	return keeper;
+	
 }
 
 GameObject* TutorialGame::AddCharacterToWorld(const Vector3& position) {
