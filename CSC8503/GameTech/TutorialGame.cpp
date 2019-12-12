@@ -169,6 +169,7 @@ void TutorialGame::RenderMenu()
 		{
 		case 1: playing = true;
 				playerID = 1000;
+				isServer = true;
 				StartGame();
 				return;
 		case 2: playerID = 2000;
@@ -242,39 +243,47 @@ void TutorialGame::UpdateGame(float dt) {
 			renderer->DrawString("!!GAMEOVER!!",
 						Vector2(450, 600), Vector4(0, 0, 1, 1));
 
-			if (isServer)
+			if (isNetworkedGame)
 			{
-				renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+				if (isServer)
+				{
+					renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+						Vector2(425, 400), Vector4(0, 0, 1, 1));
+					renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
+						Vector2(425, 350), Vector4(1, 0, 0, 1));
+				}
+				else
+				{
+					renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
+						Vector2(425, 400), Vector4(1, 0, 0, 1));
+					renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+						Vector2(425, 350), Vector4(0, 0, 1, 1));
+				}
+
+				if (world->getPlayerOneScore() > world->getPlayerTwoScore())
+				{
+					renderer->DrawString("!!BLUE WINS!!",
+						Vector2(425, 300), Vector4(0, 0, 1, 1));
+				}
+				else if (world->getPlayerOneScore() < world->getPlayerTwoScore())
+				{
+					renderer->DrawString("!!RED WINS!!",
+						Vector2(425, 300), Vector4(1, 0, 0, 1));
+				}
+				else
+				{
+					renderer->DrawString("!!DRAW!!",
+						Vector2(425, 300), Vector4(1, 0, 1, 1));
+				}
+
+				renderer->DrawString("TIME TILL NEXT MATCH: " + std::to_string(matchTimer),
+					Vector2(325, 200), Vector4(1, 0, 1, 1));
+			} else 
+			{
+				renderer->DrawString("FINAL SCORE: " + std::to_string(world->getScore()),
 					Vector2(425, 400), Vector4(0, 0, 1, 1));
-				renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
-					Vector2(425, 350), Vector4(1, 0, 0, 1));
 			}
-			else
-			{
-				renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
-					Vector2(425, 400), Vector4(1, 0, 0, 1));
-				renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
-					Vector2(425, 350), Vector4(0, 0, 1, 1));
-			}
-
-			if (world->getPlayerOneScore() > world->getPlayerTwoScore())
-			{
-				renderer->DrawString("!!BLUE WINS!!",
-					Vector2(425, 300), Vector4(0, 0, 1, 1));
-			}
-			else if (world->getPlayerOneScore() < world->getPlayerTwoScore())
-			{
-				renderer->DrawString("!!RED WINS!!",
-					Vector2(425, 300), Vector4(1, 0, 0, 1));
-			}
-			else
-			{
-				renderer->DrawString("!!DRAW!!",
-					Vector2(425, 300), Vector4(1, 0, 1, 1));
-			}
-
-			renderer->DrawString("TIME TILL NEXT MATCH: " + std::to_string(matchTimer),
-				Vector2(325, 200), Vector4(1, 0, 1, 1));
+			
 			
 			matchTimer -= dt;
 		}
@@ -313,8 +322,8 @@ void TutorialGame::UpdateGame(float dt) {
 		}
 		else 
 		{
-			renderer->DrawString("COLLECTABLE COUNT: " + std::to_string(world->GetCollectableCount()),
-				Vector2(300, 300), Vector4(0, 0, 1, 1));
+			/*renderer->DrawString("COLLECTABLE COUNT: " + std::to_string(world->GetCollectableCount()),
+				Vector2(300, 300), Vector4(0, 0, 1, 1));*/
 
 			if (isServer) 
 			{
@@ -337,7 +346,6 @@ void TutorialGame::UpdateGame(float dt) {
 		{
 			playing = false;
 			matchTimer = gameOverScreenCoolDown;
-			//ResetCamera();
 		}
 
 	}
@@ -347,25 +355,25 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 	
 
-	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
-		Vector2(10, 20)); // Draw debug text at 10 ,20
+	//renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
+	//	Vector2(10, 20)); // Draw debug text at 10 ,20
 
-	
-	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
-		Vector2(10, 20)); // Draw debug text at 10 ,20
+	//
+	//renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
+	//	Vector2(10, 20)); // Draw debug text at 10 ,20
 
-	
-	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
-		Vector2(10, 20)); // Draw debug text at 10 ,20
+	//
+	//renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
+	//	Vector2(10, 20)); // Draw debug text at 10 ,20
 
 	UpdateKeys();
 
-	if (useGravity) {
+	/*if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(10, 40));
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
-	}
+	}*/
 
 	SelectObject();
 	MoveSelectedObject();
@@ -1025,6 +1033,7 @@ Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	Enemy* keeper = new Enemy(position, world, isServer);
 
 	keeper->setPlayer(goose);
+	keeper->setPlayerTwo(playerTwo);
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);
 

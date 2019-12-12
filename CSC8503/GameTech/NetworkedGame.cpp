@@ -224,8 +224,7 @@ void NetworkedGame::UpdateGame(float dt)
 	if (thisServer)
 		UpdateAsServer(dt);
 	
-	if (playing)
-		UpdateAsClient(dt);
+	UpdateAsClient(dt);
 	
 }
 

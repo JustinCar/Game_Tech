@@ -9,6 +9,8 @@ Enemy::Enemy(Vector3 position, GameWorld* world, bool& isServer) : gameWorld(wor
 	chaseSpeed = 200;
 	rotationSpeed = 5;
 	player = nullptr;
+	playerTwo = nullptr;
+	closestPlayer = player;
 	grid = new NavigationGrid("TestGrid3.txt");
 
 	position.x = roundToNearestTen(position.x);
@@ -54,8 +56,21 @@ void Enemy::Update(float dt)
 	if (!isServerEnemy)
 		return;
 
-	if (player)
-		distanceFromPlayer = Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition());
+	if (player && playerTwo)
+	{
+		if (Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition()) >
+			Vector3::Distance(transform.GetWorldPosition(), playerTwo->GetTransform().GetWorldPosition()))
+		{
+			closestPlayer = playerTwo;
+			distanceFromPlayer = Vector3::Distance(transform.GetWorldPosition(), playerTwo->GetTransform().GetWorldPosition());
+		}
+		else 
+		{
+			closestPlayer = player;
+			distanceFromPlayer = Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition());
+		}
+	}
+		
 
 	stateMachine->Update(dt);
 }
@@ -107,12 +122,15 @@ void Enemy::Chase(float dt)
 	if (attacked)
 		attacked = false;
 
-	Player* p = static_cast<Player*>(&(*player));
+	Player* p = static_cast<Player*>(&(*closestPlayer));
 
 	if (p->IsSwimming())
 		return;
 
-	Vector3 playerPos = player->GetTransform().GetWorldPosition();
+	Vector3 playerPos = closestPlayer->GetTransform().GetWorldPosition();
+
+	RotateTowards(playerPos);
+
 	Vector3 pos = transform.GetWorldPosition();
 	playerPos.y = pos.y;
 	Vector3 dir = playerPos - pos;
@@ -127,7 +145,7 @@ void Enemy::Attack(float dt)
 		return;
 
 	attacked = true;
-	Player* p = static_cast<Player*>(&(*player));
+	Player* p = static_cast<Player*>(&(*closestPlayer));
 
 	for (int i = 0; i < p->getCollectables().size(); i++)
 	{
@@ -180,6 +198,7 @@ void Enemy::Patrol(float dt)
 
 	physicsObject->AddForce(dir * speed);
 
+	RotateTowards(node);
 
 	if (Vector3::Distance(pos, node) <= 1)
 	{
@@ -262,8 +281,9 @@ int Enemy::roundToNearestTen(int num)
 	return (10 - num % 10) + num;
 }
 
-
-//Quaternion orientation = transform.GetLocalOrientation();
+void Enemy::RotateTowards(Vector3 v)
+{
+	//Quaternion orientation = transform.GetLocalOrientation();
 
 	//Quaternion rot1 = Quaternion::RotationBetweenVectors(transform.GetWorldMatrix().GetColumn(2), node - transform.GetWorldPosition());
 
@@ -276,9 +296,10 @@ int Enemy::roundToNearestTen(int num)
 
 	////transform.SetLocalOrientation(Quaternion::Slerp(orientation, rot2 * rot1, rotationSpeed));
 
-	//Vector3 direction = node - transform.GetWorldPosition();
-	//
-	//float radians = atan2(-direction.y, direction.x);
-	//float degrees = radians * 180.0f / 3.14159265358979323846f;
-
-	//transform.SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), degrees));
+	Vector3 direction = v - transform.GetWorldPosition();
+	
+	float radians = atan2(direction.x, direction.z);
+	float degrees = radians * 180.0f / 3.14159265358979323846f;
+	
+	transform.SetLocalOrientation(Quaternion::Slerp(transform.GetLocalOrientation(), Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), degrees), rotationSpeed));
+}

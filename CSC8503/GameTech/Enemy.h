@@ -43,6 +43,9 @@ namespace NCL {
 			float getAttackRadius() { return attackRadius; };
 
 			void setPlayer(GameObject* p) { player = p; };
+			void setPlayerTwo(GameObject* p) { playerTwo = p; };
+
+			void RotateTowards(Vector3 v);
 			
 
 		protected:
@@ -74,6 +77,8 @@ namespace NCL {
 			bool& isServerEnemy;
 
 			GameObject* player;
+			GameObject* playerTwo;
+			GameObject* closestPlayer;
 
 			StateMachine* stateMachine;
 
