@@ -26,5 +26,4 @@ void Collectable::Trigger(GameObject& obj)
 	Player* p = static_cast<Player*>(&obj);
 
 	p->getCollectables().push(this);
-	int i = 0;
 }

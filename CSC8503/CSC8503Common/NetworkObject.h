@@ -29,7 +29,7 @@ namespace NCL {
 
 		struct ClientPacket : public GamePacket {
 			int		objectID = -1;
-			bool buttonstates[5];
+			bool buttonstates[6];
 			Quaternion	orientation;
 
 			ClientPacket() {

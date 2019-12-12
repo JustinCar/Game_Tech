@@ -64,7 +64,9 @@ protected:
 class ClientPacketReceiver : public PacketReceiver {
 public:
 	ClientPacketReceiver(GameWorld& w, bool p, GameObject* controlled, GameObject* ghost) : world(w), isPlayerServer(p), controlledGoose(controlled), ghostGoose(ghost) {
-
+		speed = 500;
+		jumpPower = 10000;
+		swimPower = 10000;
 	}
 
 	void ReceivePacket(int type, GamePacket* payload, int source) {
@@ -94,22 +96,8 @@ public:
 
 			Vector3 right = Vector3(x.x, x.y, x.z);
 
-			/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE) && jumpTimer <= 0) {
-				jumpTimer = jumpCoolDown;
-				physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
-			}
 
-			if (isSwimming)
-			{
-				swimTimer -= dt;
-				if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W) && swimTimer <= 0) {
-					swimTimer = swimCoolDown;
-					physicsObject->AddForce(forward * swimPower);
-				}
-			}*/
-			float speed = 500;
-
-			if (realPacket->buttonstates[0]) {
+			if (realPacket->buttonstates[0] && !realPacket->buttonstates[5]) {
 				object->GetPhysicsObject()->AddForce(forward * speed);
 			}
 
@@ -119,14 +107,19 @@ public:
 
 			if (realPacket->buttonstates[2]) {
 				object->GetPhysicsObject()->AddForce(right * speed);
-
 			}
 
 			if (realPacket->buttonstates[3]) {
 				object->GetPhysicsObject()->AddForce(-right * speed);
 			}
 
-			
+			if (realPacket->buttonstates[4]) {
+				object->GetPhysicsObject()->AddForce(Vector3(0, 1, 0) * jumpPower);
+			}
+
+			if (realPacket->buttonstates[0] && realPacket->buttonstates[5]) {
+				object->GetPhysicsObject()->AddForce(forward * swimPower);
+			}
 		}
 	}
 protected:
@@ -135,6 +128,11 @@ protected:
 	bool isPlayerServer;
 	GameObject* controlledGoose;
 	GameObject* ghostGoose;
+
+	float speed;
+	float jumpPower;
+	float swimPower;
+
 };
 
 class ConnectedPacketReceiver : public PacketReceiver {
@@ -226,8 +224,9 @@ void NetworkedGame::UpdateGame(float dt)
 	if (thisServer)
 		UpdateAsServer(dt);
 	
-
-	UpdateAsClient(dt);
+	if (playing)
+		UpdateAsClient(dt);
+	
 }
 
 void NetworkedGame::SpawnPlayer()
@@ -256,61 +255,6 @@ void NetworkedGame::StartLevel()
 
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source)
 {
-	ClientPacket* realPacket = (ClientPacket*)payload;
-
-	GameObject* object = nullptr;
-
-	if (realPacket->objectID == 1000 && isServer)
-		object = goose;
-	else if (realPacket->objectID == 1000 && !isServer)
-		object = playerTwo;
-
-	if (realPacket->objectID == 2000 && isServer)
-		object = playerTwo;
-	else if (realPacket->objectID == 2000 && !isServer)
-		object = goose;
-
-	object->GetTransform().SetLocalOrientation(realPacket->orientation);
-
-	Vector4 z = object->GetTransform().GetWorldMatrix().GetColumn(2);
-
-	Vector3 forward = Vector3(z.x, z.y, z.z);
-
-	Vector4 x = object->GetTransform().GetWorldMatrix().GetColumn(0);
-
-	Vector3 right = Vector3(x.x, x.y, x.z);
-
-	/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE) && jumpTimer <= 0) {
-		jumpTimer = jumpCoolDown;
-		physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
-	}
-
-	if (isSwimming)
-	{
-		swimTimer -= dt;
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W) && swimTimer <= 0) {
-			swimTimer = swimCoolDown;
-			physicsObject->AddForce(forward * swimPower);
-		}
-	}*/
-	float speed = 500;
-
-	if (realPacket->buttonstates[0]) {
-		object->GetPhysicsObject()->AddForce(forward * speed);
-	}
-
-	if (realPacket->buttonstates[1]) {
-		object->GetPhysicsObject()->AddForce(-forward * speed);
-	}
-
-	if (realPacket->buttonstates[2]) {
-		object->GetPhysicsObject()->AddForce(right * speed);
-
-	}
-
-	if (realPacket->buttonstates[3]) {
-		object->GetPhysicsObject()->AddForce(-right * speed);
-	}
 
 }
 
@@ -340,7 +284,7 @@ void NetworkedGame::UpdateAsClient(float dt) {
 
 	ClientPacket newPacket;
 
-	for (int i = 0; i < 5; i++) 
+	for (int i = 0; i < 6; i++) 
 	{
 		newPacket.buttonstates[i] = false;
 	}
@@ -372,25 +316,35 @@ void NetworkedGame::UpdateAsClient(float dt) {
 	{
 		newPacket.objectID = 2000;
 
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::U)) {
+		bool* buttonStates = goose->getButtonStates();
+
+		if (buttonStates[0]) {
 			newPacket.buttonstates[0] = true;
 		}
 
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::J)) {
+		if (buttonStates[1]) {
 			newPacket.buttonstates[1] = true;
 		}
 
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::H)) {
+		if (buttonStates[2]) {
 			newPacket.buttonstates[2] = true;
 
 		}
 
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::K)) {
+		if (buttonStates[3]) {
 			newPacket.buttonstates[3] = true;
+		}
+
+		if (buttonStates[4]) {
+
+			newPacket.buttonstates[4] = true;
+		}
+
+		if (buttonStates[5]) {
+			newPacket.buttonstates[5] = true;
 		}
 	}
 	
-
 	thisClient -> SendPacket(newPacket);
 }
 

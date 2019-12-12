@@ -29,6 +29,8 @@ namespace NCL {
 			virtual void OnCollisionEnd(GameObject* otherObject);
 
 			bool IsSwimming() { return isSwimming; };
+
+			bool* getButtonStates() { return buttonStates; };
 			
 		protected:
 			void UpdateServerPlayerKeys(float dt);
@@ -48,6 +50,8 @@ namespace NCL {
 			float jumpCoolDown;
 
 			int playerID;
+
+			bool buttonStates[6];
 
 			std::queue<GameObject*> collectables;
 		};

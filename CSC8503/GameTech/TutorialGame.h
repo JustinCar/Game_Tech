@@ -76,6 +76,10 @@ namespace NCL {
 			bool isServer;
 			int playerID;
 
+			void RestartNetworkedGame();
+
+			bool newSession;
+
 			float matchTimer;
 			float gameOverScreenCoolDown;
 

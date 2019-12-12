@@ -300,6 +300,7 @@ void PhysicsSystem::HandleScoreIncrease(GameObject* player)
 
 		gameWorld.DecrementCollectableCount();
 	}
+	int i = 0;
 }
 
 void PhysicsSystem::HandleCollectable(GameObject* player, GameObject* collectable)

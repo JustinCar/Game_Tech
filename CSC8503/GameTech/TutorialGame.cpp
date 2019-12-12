@@ -19,10 +19,12 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 
+	newSession = true;
+
 	goose = nullptr;
 
 	matchTimer = -1;
-	gameOverScreenCoolDown = 20.0f;
+	gameOverScreenCoolDown = 2.0f;
 
 	buttonSelected = 1;
 	playing = false;
@@ -106,6 +108,47 @@ void TutorialGame::StartGame()
 			(*i)->SetNetworkObject(new NetworkObject(*(*i), counter));
 		counter++;
 	}
+}
+
+void TutorialGame::RestartNetworkedGame()
+{
+	newSession = false;
+	playing = true;
+	world->setPlayerOneScore(0);
+	world->setPlayerTwoScore(0);
+	Vector3 offSet(220, 0, 195);
+	matchTimer = 100;
+
+	if (playerID == 1000)
+	{
+		goose->GetTransform().SetWorldPosition(offSet + Vector3(55, 10, 0) + Vector3(5, 0, 5));
+		playerTwo->GetTransform().SetWorldPosition(offSet + Vector3(55, 10, 0) - Vector3(5, 0, 5));
+	}
+	else
+	{
+		goose->GetTransform().SetWorldPosition(offSet + Vector3(45, 10, 0) - Vector3(5, 0, 5));
+		playerTwo->GetTransform().SetWorldPosition(offSet + Vector3(55, 10, 0) + Vector3(5, 0, 5));
+	}
+
+	std::vector < GameObject* >::const_iterator first;
+	std::vector < GameObject* >::const_iterator last;
+
+	world->GetObjectIterators(first, last);
+
+	int collectableCounter = 0;
+
+	for (auto i = first; i != last; ++i)
+	{
+		if ((*i)->getLayer() == 4)
+		{
+			int xPos = rand() % 480;
+			int zPos = rand() % 420;
+			(*i)->GetTransform().SetWorldPosition(Vector3(xPos, 10, zPos));
+			collectableCounter++;
+		}
+	}
+
+	world->SetCollectableCount(collectableCounter);
 }
 
 void TutorialGame::RenderMenu()
@@ -235,16 +278,21 @@ void TutorialGame::UpdateGame(float dt) {
 			
 			matchTimer -= dt;
 		}
-		else if (matchTimer <= 0 && world->getScore() > 0)
+		else if (!isNetworkedGame && matchTimer <= 0 && world->getScore() > 0)
 		{
 			physics->Clear();
 			world->ClearAndErase();
+		} 
+		else if (isNetworkedGame && matchTimer <= 0 && ((world->getPlayerOneScore() + world->getPlayerTwoScore()) > 0))
+		{
+			if (isServer)
+				RestartNetworkedGame();
 		}
 		else if (!isNetworkedGame)
 		{
 			RenderMenu();
 		}
-		else if (isNetworkedGame)
+		else if (isNetworkedGame && newSession)
 		{
 			playing = true;
 			StartGame();
@@ -289,7 +337,7 @@ void TutorialGame::UpdateGame(float dt) {
 		{
 			playing = false;
 			matchTimer = gameOverScreenCoolDown;
-			ResetCamera();
+			//ResetCamera();
 		}
 
 	}
@@ -635,19 +683,22 @@ void TutorialGame::InitWorld() {
 
 	//InitMixedGridWorld(10, 10, 3.5f, 3.5f);
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
+
 	AddAppleToWorld(offSet + Vector3(55, 10, 0));
+	world->IncrementCollectableCount();
+	AddAppleToWorld(offSet + Vector3(60, 10, 0));
 	world->IncrementCollectableCount();
 
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	for (int i = 0; i < 10; i++)
+	/*for (int i = 0; i < 10; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
 		AddAppleToWorld(Vector3(xPos, 10, zPos));
 		world->IncrementCollectableCount();
-	}
+	}*/
 
 	/*for (int i = 0; i < 0; i++)
 	{

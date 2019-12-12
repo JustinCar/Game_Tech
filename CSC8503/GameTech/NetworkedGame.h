@@ -17,7 +17,6 @@ namespace NCL {
 
 			void UpdateGame(float dt) override;
 
-			void SpawnPlayer();
 
 			void StartLevel();
 
@@ -34,6 +33,8 @@ namespace NCL {
 			void BroadcastSnapshot(bool deltaFrame);
 			void UpdateMinimumState();
 			std::map<int, int> stateIDs;
+
+			void SpawnPlayer();
 
 			GameServer* thisServer;
 			GameClient* thisClient;
