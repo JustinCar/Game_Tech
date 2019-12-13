@@ -20,6 +20,9 @@ Player::Player(int id) : GameObject("PLAYER")
 	swimCoolDown = 1;
 	isSwimming = false;
 
+	for (int i = 0; i < 6; i++)
+		buttonStates[i] = false;
+
 	layer = 2;
 	layerMask = 0; // Collide with everything
 }
@@ -147,33 +150,63 @@ void Player::UpdateClientPlayerKeys(float dt)
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RETURN) && jumpTimer <= 0) {
 		jumpTimer = jumpCoolDown;
-		physicsObject->AddForce(Vector3(0, 1, 0) * jumpPower);
+		buttonStates[4] = true;
 	}
+	else
+	{
+		buttonStates[4] = false;
+	}
+
+	buttonStates[5] = isSwimming;
 
 	if (isSwimming)
 	{
 		swimTimer -= dt;
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::U) && swimTimer <= 0) {
 			swimTimer = swimCoolDown;
-			physicsObject->AddForce(forward * swimPower);
+			buttonStates[0] = true;
+		}
+		else
+		{
+			buttonStates[0] = false;
 		}
 	}
+	else
+	{
+		buttonStates[0] = false;
+	}
+	
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::U) && !isSwimming) {
-		physicsObject->AddForce(forward * speed);
+		buttonStates[0] = true;
+	}
+	else if (!isSwimming)
+	{
+		buttonStates[0] = false;
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::J) && !isSwimming) {
-		physicsObject->AddForce(-forward * speed);
+		buttonStates[1] = true;
+	}
+	else
+	{
+		buttonStates[1] = false;
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::H) && !isSwimming) {
-		physicsObject->AddForce(right * speed);
-
+		buttonStates[2] = true;
+	}
+	else
+	{
+		buttonStates[2] = false;
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::K) && !isSwimming) {
-		physicsObject->AddForce(-right * speed);
+		buttonStates[3] = true;
+	}
+	else
+	{
+		buttonStates[3] = false;
 	}
 }
 

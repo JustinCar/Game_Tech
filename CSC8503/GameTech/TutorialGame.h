@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "Collectable.h"
 #include <string> 
+#include <iostream>
+#include <fstream>
 
 namespace NCL {
 	namespace CSC8503 {
@@ -49,7 +51,7 @@ namespace NCL {
 			GameObject* AddTerrainToWorld(const Vector3& position, const Vector3& size, const Vector4& colour);
 			GameObject* AddLakeToWorld(const Vector3& position, const Vector3& size, const Vector4& colour);
 
-			void AddBridgeToWorld(Vector3 startPos);
+			void AddBridgeToWorld(Vector3 startPos, int num);
 
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
@@ -65,7 +67,13 @@ namespace NCL {
 			GameObject* playerTwo;
 			vector<Enemy*> enemies;
 
+			void StoreHighScore();
+			std::string fileName;
+
+			int secondPlayerScore;
+
 			void RenderMenu();
+			void RenderScoreBoard();
 			int buttonSelected;
 			bool playing;
 			void StartGame();
@@ -73,6 +81,10 @@ namespace NCL {
 			bool isNetworkedGame;
 			bool isServer;
 			int playerID;
+
+			void RestartNetworkedGame();
+
+			bool newSession;
 
 			float matchTimer;
 			float gameOverScreenCoolDown;
@@ -84,7 +96,7 @@ namespace NCL {
 			bool useGravity;
 			bool inSelectionMode;
 
-			float		forceMagnitude;
+			float	forceMagnitude;
 
 			GameObject* selectionObject = nullptr;
 

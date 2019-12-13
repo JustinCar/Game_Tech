@@ -20,7 +20,6 @@ namespace NCL {
 		public:
 			Enemy(Vector3 position, GameWorld* world, bool& isServer);
 			~Enemy();
-			//void UpdateEnemy(float dt);
 			virtual void Update(float dt);
 			virtual void Trigger(GameObject& obj);
 
@@ -43,7 +42,11 @@ namespace NCL {
 			float getAttackRadius() { return attackRadius; };
 
 			void setPlayer(GameObject* p) { player = p; };
-			
+			void setPlayerTwo(GameObject* p) { playerTwo = p; };
+
+			void RotateTowards(Vector3 v);
+
+			void resetPosition();
 
 		protected:
 			void GeneratePath();
@@ -69,11 +72,15 @@ namespace NCL {
 			float distanceFromPlayer;
 			float chaseRadius;
 			float attackRadius;
-			bool attacked;
+
+			float attackTimer;
+			float attackCooldown;
 
 			bool& isServerEnemy;
 
 			GameObject* player;
+			GameObject* playerTwo;
+			GameObject* closestPlayer;
 
 			StateMachine* stateMachine;
 

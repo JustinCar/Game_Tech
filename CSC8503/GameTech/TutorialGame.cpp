@@ -19,10 +19,14 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 
+	newSession = true;
+
+	fileName = "highscores";
+
 	goose = nullptr;
 
-	matchTimer = 0;
-	gameOverScreenCoolDown = 5.0f;
+	matchTimer = -1;
+	gameOverScreenCoolDown = 20.0f;
 
 	buttonSelected = 1;
 	playing = false;
@@ -108,6 +112,88 @@ void TutorialGame::StartGame()
 	}
 }
 
+void TutorialGame::RestartNetworkedGame()
+{
+	//StoreHighScore();
+	newSession = false;
+	playing = true;
+	world->setPlayerOneScore(0);
+	world->setPlayerTwoScore(0);
+	Vector3 offSet(275, 10, 195);
+	matchTimer = 100;
+	goose->GetNetworkObject()->resetScore();
+	playerTwo->GetNetworkObject()->resetScore();
+	physics->Clear();
+
+	if (isServer)
+	{
+		goose->GetTransform().SetWorldPosition(offSet + Vector3(5, 0, 5));
+		playerTwo->GetTransform().SetWorldPosition(offSet - Vector3(5, 0, 5));
+	}
+
+	std::vector < GameObject* >::const_iterator first;
+	std::vector < GameObject* >::const_iterator last;
+
+	world->GetObjectIterators(first, last);
+
+	int collectableCounter = 0;
+
+	for (auto i = first; i != last; ++i)
+	{
+		// Reset Collectables
+		if ((*i)->getLayer() == 4)
+		{
+			(*i)->setLayerMask(4);
+			int xPos = rand() % 480;
+			int zPos = rand() % 420;
+			(*i)->GetTransform().SetWorldPosition(Vector3(xPos, 10, zPos));
+			(*i)->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
+			collectableCounter++;
+		}
+
+		// Reset Enemies
+		if ((*i)->getLayer() == 3)
+		{
+			Enemy* e = (Enemy*)(*i);
+			e->resetPosition();
+		}
+	}
+
+	world->SetCollectableCount(collectableCounter);
+}
+
+void TutorialGame::RenderScoreBoard()
+{
+	if (isServer)
+	{
+		renderer->DrawString("YOUR TOTAL SCORE: " + std::to_string(world->GetPlayerOneTotal()),
+			Vector2(400, 400), Vector4(0, 0, 1, 1));
+		renderer->DrawString("THEIR TOTAL SCORE: " + std::to_string(world->GetPlayerTwoTotal()),
+			Vector2(400, 350), Vector4(1, 0, 0, 1));
+	}
+	else
+	{
+		renderer->DrawString("YOUR TOTAL SCORE: " + std::to_string(world->GetPlayerTwoTotal()),
+			Vector2(400, 400), Vector4(1, 0, 0, 1));
+		renderer->DrawString("THEIR TOTAL SCORE: " + std::to_string(world->GetPlayerOneTotal()),
+			Vector2(400, 350), Vector4(0, 0, 1, 1));
+	}
+}
+
+void TutorialGame::StoreHighScore()
+{
+	std::ofstream myfile;
+	myfile.open(fileName, std::ifstream::out, std::ifstream::trunc);
+
+	myfile << "HIGH SCORES FROM LAST MATCH" << "\n";
+
+	myfile << "Player One (Blue): " << std::to_string(world->GetPlayerOneTotal()) << "\n";
+
+	myfile << "Player Two (Red): " << std::to_string(world->GetPlayerTwoTotal()) << "\n";
+
+	myfile.close();
+}
+
 void TutorialGame::RenderMenu()
 {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN) && buttonSelected != 4) {
@@ -126,17 +212,20 @@ void TutorialGame::RenderMenu()
 		{
 		case 1: playing = true;
 				playerID = 1000;
+				isServer = true;
 				StartGame();
 				return;
 		case 2: playerID = 2000;
 				playing = true;
 				isNetworkedGame = true;
+				world->SetIsNetworkedGame(true);
 				StartGame();
 				return;
 		case 3: playerID = 1000;
 				playing = true;
 				isNetworkedGame = true;
 				world->SetIsServer(true);
+				world->SetIsNetworkedGame(true);
 				isServer = true;
 				StartGame();
 				return;
@@ -197,60 +286,120 @@ void TutorialGame::UpdateGame(float dt) {
 			renderer->DrawString("!!GAMEOVER!!",
 						Vector2(450, 600), Vector4(0, 0, 1, 1));
 
-			renderer->DrawString("FINAL SCORE: " + std::to_string(world->getScore()),
-				Vector2(425, 400), Vector4(0, 0, 1, 1));
+			if (isNetworkedGame)
+			{
+				if (isServer)
+				{
+					renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+						Vector2(425, 400), Vector4(0, 0, 1, 1));
+					renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
+						Vector2(425, 350), Vector4(1, 0, 0, 1));
+				}
+				else
+				{
+					renderer->DrawString("YOUR FINAL SCORE: " + std::to_string(world->getPlayerTwoScore()),
+						Vector2(425, 400), Vector4(1, 0, 0, 1));
+					renderer->DrawString("THEIR FINAL SCORE: " + std::to_string(world->getPlayerOneScore()),
+						Vector2(425, 350), Vector4(0, 0, 1, 1));
+				}
+
+				if (world->getPlayerOneScore() > world->getPlayerTwoScore())
+				{
+					renderer->DrawString("!!BLUE WINS!!",
+						Vector2(425, 300), Vector4(0, 0, 1, 1));
+				}
+				else if (world->getPlayerOneScore() < world->getPlayerTwoScore())
+				{
+					renderer->DrawString("!!RED WINS!!",
+						Vector2(425, 300), Vector4(1, 0, 0, 1));
+				}
+				else
+				{
+					renderer->DrawString("!!DRAW!!",
+						Vector2(425, 300), Vector4(1, 0, 1, 1));
+				}
+
+				renderer->DrawString("TIME TILL NEXT MATCH: " + std::to_string(matchTimer),
+					Vector2(325, 200), Vector4(1, 0, 1, 1));
+			} else 
+			{
+				renderer->DrawString("FINAL SCORE: " + std::to_string(world->getScore()),
+					Vector2(425, 400), Vector4(0, 0, 1, 1));
+			}
+			
+			
 			matchTimer -= dt;
 		}
-		else	
+		else if (!isNetworkedGame && matchTimer <= 0 && world->getScore() > 0)
+		{
+			physics->Clear();
+			world->ClearAndErase();
+		} 
+		else if (isNetworkedGame && matchTimer <= 0)
+		{
+			if (isServer)
+				RestartNetworkedGame();
+			else
+			{
+				newSession = false;
+				playing = true;
+				matchTimer = 100;
+				world->SetCollectableCount(1);
+			}
+		}
+		else if (!isNetworkedGame)
+		{
 			RenderMenu();
+		}
 	}
-		
 	else
 	{
-		matchTimer -= dt;
 
-		renderer->DrawString("SCORE: " + std::to_string(world->getScore()),
-			Vector2(50, 600), Vector4(0, 0, 1, 1));
+		if (!isNetworkedGame)
+		{
+			matchTimer -= dt;
+			int seconds = matchTimer;
+			renderer->DrawString(std::to_string(seconds / 60) + "." + std::to_string(seconds % 60),
+				Vector2(640, 600), Vector4(0, 0, 1, 1));
 
-		int seconds = matchTimer;
-		renderer->DrawString(std::to_string(seconds / 60) + "." + std::to_string(seconds % 60),
-			Vector2(640, 600), Vector4(0, 0, 1, 1));
+			renderer->DrawString("SCORE: " + std::to_string(world->getScore()),
+						Vector2(50, 600), Vector4(0, 0, 1, 1));
+		}
+		else 
+		{
+			if (Window::GetKeyboard()->KeyDown(KeyboardKeys::TAB))
+				RenderScoreBoard();
+
+			if (isServer) 
+			{
+				renderer->DrawString("YOUR SCORE: " + std::to_string(world->getPlayerOneScore()),
+					Vector2(50, 600), Vector4(0, 0, 1, 1));
+				renderer->DrawString("THEIR SCORE: " + std::to_string(world->getPlayerTwoScore()),
+					Vector2(50, 550), Vector4(1, 0, 0, 1));
+			}
+			else 
+			{
+				renderer->DrawString("YOUR SCORE: " + std::to_string(world->getPlayerTwoScore()),
+					Vector2(50, 600), Vector4(1, 0, 0, 1));
+				renderer->DrawString("THEIR SCORE: " + std::to_string(world->getPlayerOneScore()),
+					Vector2(50, 550), Vector4(0, 0, 1, 1));
+			}
+		}
 
 		// Gameover
 		if ((matchTimer <= 0) || (world->GetCollectableCount() == 0))
 		{
-			physics->Clear();
-			world->ClearAndErase();
 			playing = false;
 			matchTimer = gameOverScreenCoolDown;
-			ResetCamera();
 		}
+
 	}
 	
 	if (lockedObject != nullptr) {
 		LockedCameraMovement();
 	}
-	
-
-	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
-		Vector2(10, 20)); // Draw debug text at 10 ,20
-
-	
-	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
-		Vector2(10, 20)); // Draw debug text at 10 ,20
-
-	
-	renderer->DrawString(" Click Force :" + std::to_string(forceMagnitude),
-		Vector2(10, 20)); // Draw debug text at 10 ,20
 
 	UpdateKeys();
-
-	if (useGravity) {
-		Debug::Print("(G)ravity on", Vector2(10, 40));
-	}
-	else {
-		Debug::Print("(G)ravity off", Vector2(10, 40));
-	}
 
 	SelectObject();
 	MoveSelectedObject();
@@ -260,23 +409,6 @@ void TutorialGame::UpdateGame(float dt) {
 	Debug::DrawLine(Vector3(480, 0, 0), Vector3(480, 50, 0), Vector4(1, 0, 0, 1));
 	Debug::DrawLine(Vector3(480, 0, 420), Vector3(480, 50, 420), Vector4(1, 0, 0, 1));
 	Debug::DrawLine(Vector3(0, 0, 420), Vector3(0, 50, 420), Vector4(1, 0, 0, 1));
-
-	/*for (int i = 0; i < 490; i += 10) 
-	{
-		for (int j = 0; j < 430; j += 10)
-		{
-			Vector3 v(i, 0, j);
-			Vector3 b(v);
-			b.y += 50;
-
-			if ((i >= 160 && i <= 320) &&
-				(j >= 160 && j <= 260))
-				continue;
-
-			Debug::DrawLine(v, b, Vector4(1, 0, 0, 1));
-		}
-	}*/
-	
 
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
@@ -440,7 +572,7 @@ bool TutorialGame::SelectObject() {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
-				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				//selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 
 				renderer->DrawString("DEBUG INFO: ",
 					Vector2(10, 300), Vector4(0, 0, 1, 1));
@@ -566,43 +698,43 @@ void TutorialGame::InitWorld() {
 
 	Vector3 offSet(220, 0, 195);
 
-	//InitMixedGridWorld(10, 10, 3.5f, 3.5f);
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
-	AddAppleToWorld(offSet + Vector3(55, 10, 0));
 
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
-		AddAppleToWorld(Vector3(xPos, 10, zPos));
+
+		AddAppleToWorld(Vector3(xPos, 40, zPos));
 		world->IncrementCollectableCount();
 	}
 
-	for (int i = 0; i < 0; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
-		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
+
+		AddBonusItemToWorld(Vector3(xPos, 40, zPos));
 		world->IncrementCollectableCount();
 	}
 
-	for (int i = 0; i < 6; i++) 
+	for (int i = 0; i < 8; i++) 
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
 		enemies.push_back(AddParkKeeperToWorld(Vector3(xPos, 12, zPos)));
 	}
 
-	AddCharacterToWorld(offSet + Vector3(65, 10, 0));
+	Vector3 westBridgeStartPos = Vector3(42, 8, 15);
+	Vector3 eastBridgeStartPos = Vector3(-100, 8, 15);
+	Vector3 bigBridgeStartPos = Vector3(-50, 8, -35);
 
-	Vector3 westBridgeStartPos = Vector3(42, 7, 15);
-	Vector3 eastBridgeStartPos = Vector3(-58, 7, 15);
-
-	AddBridgeToWorld(offSet + westBridgeStartPos);
-	AddBridgeToWorld(offSet + eastBridgeStartPos);
+	AddBridgeToWorld(offSet + westBridgeStartPos, 1);
+	AddBridgeToWorld(offSet + eastBridgeStartPos, 2);
+	AddBridgeToWorld(offSet + bigBridgeStartPos, 3);
 
 	Vector4 green = Vector4(0, 0.6, 0, 1);
 	Vector4 blue = Vector4(0, 0, 1, 1);
@@ -625,7 +757,7 @@ void TutorialGame::InitWorld() {
 	island->setLayer(5);
 	island->setLayerMask(49);
 	
-	AddLakeToWorld(offSet + Vector3(20, -12, 15), Vector3(80, 20, 50), blue); // Lake
+	AddLakeToWorld(offSet + Vector3(20, -12, 15), Vector3(80, 20, 50), Vector4(0, 0.41, 0.58, 1)); // Lake
 }
 
 //From here on it's functions to add in objects to the world!
@@ -732,29 +864,50 @@ GameObject* TutorialGame::AddLakeToWorld(const Vector3& position, const Vector3&
 	return floor;
 }
 
-void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
+void TutorialGame::AddBridgeToWorld(Vector3 startPos, int num) {
 	Vector3 cubeSize = Vector3(1, 1, 10);
 
-	float	invCubeMass = 0.5;
-	int		numLinks = 26;
-	float	maxDistance = 2;
+	float	invCubeMass = 0.01;
+	int		numLinks = 55;
+	float	maxDistance = 1.2;
 	float	cubeDistance = 2;
+
+	int layerMask = 53;
 
 	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
 
 	//Vector3 startPos = Vector3(36, 7, 15);
 
+	Vector3 endPos = startPos;
+
+	if (num == 1)
+	{
+		endPos.y += 19;
+	}
+	else if (num == 2)
+	{
+		startPos.y += 19;
+		numLinks = 47;
+	}
+	else 
+	{
+		startPos.y += 19;
+		endPos.y += 19;
+		numLinks = 100;
+	}
+
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
 
 	start->setLayer(1);
-	start->setLayerMask(35);
+	start->setLayerMask(layerMask);
 
 	start->GetRenderObject()->SetColour(brown);
+	
 
-	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
+	GameObject* end = AddCubeToWorld(endPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
 
 	end->setLayer(1);
-	end->setLayerMask(35);
+	end->setLayerMask(layerMask);
 
 	end->GetRenderObject()->SetColour(brown);
 
@@ -764,7 +917,7 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos) {
 		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
 		
 		block->setLayer(1);
-		block->setLayerMask(35);
+		block->setLayerMask(layerMask);
 		
 		block->GetRenderObject()->SetColour(brown);
 		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
@@ -906,6 +1059,7 @@ Enemy* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	Enemy* keeper = new Enemy(position, world, isServer);
 
 	keeper->setPlayer(goose);
+	keeper->setPlayerTwo(playerTwo);
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -972,6 +1126,7 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 
 	apple->GetPhysicsObject()->SetInverseMass(100.0f);
 	apple->GetPhysicsObject()->InitSphereInertia();
+	apple->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 
 	world->AddGameObject(apple);
 
@@ -981,13 +1136,14 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 GameObject* TutorialGame::AddBonusItemToWorld(const Vector3& position) {
 	Collectable* box = new Collectable(20, position);
 
-	AABBVolume* volume = new AABBVolume(Vector3(0.15, 0.15, 0.15));
+	AABBVolume* volume = new AABBVolume(Vector3(0.8, 0.8, 0.8));
 	box->SetBoundingVolume((CollisionVolume*)volume);
-	box->GetTransform().SetWorldScale(Vector3(0.3, 0.3, 0.3));
+	box->GetTransform().SetWorldScale(Vector3(0.8, 0.8, 0.8));
 	box->GetTransform().SetWorldPosition(position);
 
 	box->SetRenderObject(new RenderObject(&box->GetTransform(), cubeMesh, nullptr, basicShader));
 	box->SetPhysicsObject(new PhysicsObject(&box->GetTransform(), box->GetBoundingVolume()));
+	box->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 
 	box->GetPhysicsObject()->SetInverseMass(100.0f);
 	box->GetPhysicsObject()->InitSphereInertia();

@@ -1,13 +1,1 @@
-﻿  Camera.cpp
-  Maths.cpp
-  Matrix3.cpp
-  Matrix4.cpp
-  MeshGeometry.cpp
-  Plane.cpp
-  Quaternion.cpp
-  SimpleFont.cpp
-  Vector2.cpp
-  Vector3.cpp
-  Vector4.cpp
-  Generating Code...
-  Common.vcxproj -> C:\Users\b6038386\Documents\GitHub\Game_Tech\Win32\Debug\Common.lib
+﻿  Common.vcxproj -> C:\Users\b6038386\Documents\GitHub\Game_Tech\Win32\Debug\Common.lib

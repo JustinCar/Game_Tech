@@ -7,6 +7,8 @@ NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
 	networkID   = id;
+	playerScore = 0;
+	playerTotalScore = 0;
 }
 
 NetworkObject::~NetworkObject()	{
@@ -105,6 +107,9 @@ bool NetworkObject::WriteDeltaPacket(GamePacket**p, int stateID) {
 bool NetworkObject::WriteFullPacket(GamePacket**p) {
 	FullPacket* fp = new FullPacket();
 
+	fp->score = playerScore;
+	fp->totalScore = playerTotalScore;
+	fp->fullState.colour = object.GetRenderObject()->GetColour();
 	fp->objectID				= networkID;
 	fp->fullState.position		= object.GetTransform().GetWorldPosition();
 	fp->fullState.orientation	= object.GetTransform().GetWorldOrientation();
