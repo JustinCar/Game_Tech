@@ -1,62 +1,24 @@
-﻿  Enemy.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp: note: see previous definition of '_WINSOCKAPI_'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(19,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(19,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(20,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(20,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(29,32): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(29,22): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(34,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(35,38): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(155,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(217,13): warning C4018:  '>=': signed/unsigned mismatch
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(234,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(234,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(235,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(235,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(245,27): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(245,17): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-  EnemyChaseSuperState.cpp
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(263,20): warning C4018:  '<': signed/unsigned mismatch
-  EnemyPatrolSuperState.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\EnemyChaseSuperState.cpp: note: see previous definition of '_WINSOCKAPI_'
-  Main.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\EnemyPatrolSuperState.cpp: note: see previous definition of '_WINSOCKAPI_'
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Main.cpp: note: see previous definition of '_WINSOCKAPI_'
-  NetworkPlayer.cpp
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Main.cpp(103,20): warning C4018:  '<': signed/unsigned mismatch
-  NetworkedGame.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\NetworkPlayer.cpp: note: see previous definition of '_WINSOCKAPI_'
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\NetworkedGame.cpp: note: see previous definition of '_WINSOCKAPI_'
-  TutorialGame.cpp
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\NetworkedGame.cpp(355,20): warning C4018:  '<': signed/unsigned mismatch
+﻿  TutorialGame.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp: note: see previous definition of '_WINSOCKAPI_'
 C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(78,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(148,60): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(148,50): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(357,16): warning C4244:  'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(729,60): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(729,50): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(740,38): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(742,44): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(743,42): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(761,93): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(767,42): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(808,58): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(849,23): warning C4305:  '-=': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(871,26): warning C4305:  'initializing': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(873,25): warning C4305:  'initializing': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(878,42): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1064,60): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1100,60): warning C4305:  'argument': truncation from 'double' to 'float'
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1140,59): warning C4305:  'argument': truncation from 'double' to 'float'
-  Generating Code...
-C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1142,57): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(149,60): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(149,50): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(361,16): warning C4244:  'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(733,60): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(733,50): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(744,38): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(746,44): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(747,42): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(765,93): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(771,42): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(812,58): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(853,23): warning C4305:  '-=': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(875,26): warning C4305:  'initializing': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(877,25): warning C4305:  'initializing': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(882,42): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1068,60): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1104,60): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1144,59): warning C4305:  'argument': truncation from 'double' to 'float'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\TutorialGame.cpp(1146,57): warning C4305:  'argument': truncation from 'double' to 'float'
   GameTech.vcxproj -> C:\Users\b6038386\Documents\GitHub\Game_Tech\Win32\Debug\GameTech.exe

@@ -47,6 +47,8 @@ namespace NCL {
 
 			void RotateTowards(Vector3 v);
 
+			void resetPosition();
+
 		protected:
 			void GeneratePath();
 			int roundToNearestTen(int num);

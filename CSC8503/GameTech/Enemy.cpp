@@ -53,6 +53,23 @@ Enemy::~Enemy()
 
 }
 
+void Enemy::resetPosition()
+{
+	
+	int xPos = rand() % 480;
+	int zPos = rand() % 420;
+	Vector3 position(xPos, 0, zPos);
+
+	while (!grid->ValidStartingPosition(position))
+	{
+		xPos = rand() % 480;
+		zPos = rand() % 420;
+		position = Vector3(xPos, 12, zPos);
+	}
+
+	transform.SetWorldPosition(position);
+}
+
 void Enemy::Update(float dt)
 {
 	if (!isServerEnemy)
@@ -164,6 +181,11 @@ void Enemy::Attack(float dt)
 		p->getCollectables().pop();
 	}
 
+	Vector3 dir = p->GetTransform().GetWorldPosition() - transform.GetWorldPosition();
+	dir.Normalise();
+
+	p->GetPhysicsObject()->AddForce(dir * 10000);
+
 	pathNodes.clear();
 	index = 0;
 	GeneratePath();
@@ -193,7 +215,7 @@ void Enemy::Patrol(float dt)
 
 	timeSpentPatrolling += dt;
 
-	DisplayPathfinding();
+	//DisplayPathfinding();
 
 	Vector3 node = pathNodes[index];
 
@@ -274,7 +296,7 @@ void Enemy::DisplayPathfinding() {
 	Vector3 up = pathNodes[0];
 	up.y += 30;
 
-	//Debug::DrawLine(pathNodes[0] + pathfindingOffSet, up + pathfindingOffSet, Vector4(0, 0, 1, 1));
+	Debug::DrawLine(pathNodes[0] + pathfindingOffSet, up + pathfindingOffSet, Vector4(0, 0, 1, 1));
 }
 
 int Enemy::roundToNearestTen(int num)
@@ -293,18 +315,6 @@ int Enemy::roundToNearestTen(int num)
 
 void Enemy::RotateTowards(Vector3 v)
 {
-	//Quaternion orientation = transform.GetLocalOrientation();
-
-	//Quaternion rot1 = Quaternion::RotationBetweenVectors(transform.GetWorldMatrix().GetColumn(2), node - transform.GetWorldPosition());
-
-	//Vector3 right = Vector3::Cross(node - transform.GetWorldPosition(), Vector3(0, 1, 0));
-	//Vector3 up = Vector3::Cross(right, node - transform.GetWorldPosition());
-
-	//Vector3 newUp = rot1 * Vector3(0, 1, 0);
-
-	//Quaternion rot2 = Quaternion::RotationBetweenVectors(newUp, up);
-
-	////transform.SetLocalOrientation(Quaternion::Slerp(orientation, rot2 * rot1, rotationSpeed));
 
 	Vector3 direction = v - transform.GetWorldPosition();
 	

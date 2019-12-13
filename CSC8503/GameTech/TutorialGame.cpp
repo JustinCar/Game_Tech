@@ -140,6 +140,7 @@ void TutorialGame::RestartNetworkedGame()
 
 	for (auto i = first; i != last; ++i)
 	{
+		// Reset Collectables
 		if ((*i)->getLayer() == 4)
 		{
 			(*i)->setLayerMask(4);
@@ -148,6 +149,13 @@ void TutorialGame::RestartNetworkedGame()
 			(*i)->GetTransform().SetWorldPosition(Vector3(xPos, 10, zPos));
 			(*i)->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 			collectableCounter++;
+		}
+
+		// Reset Enemies
+		if ((*i)->getLayer() == 3)
+		{
+			Enemy* e = (Enemy*)(*i);
+			e->resetPosition();
 		}
 	}
 
@@ -327,7 +335,7 @@ void TutorialGame::UpdateGame(float dt) {
 			physics->Clear();
 			world->ClearAndErase();
 		} 
-		else if (isNetworkedGame && matchTimer <= 0 && ((world->getPlayerOneScore() + world->getPlayerTwoScore()) > 0))
+		else if (isNetworkedGame && matchTimer <= 0)
 		{
 			if (isServer)
 				RestartNetworkedGame();
@@ -336,6 +344,7 @@ void TutorialGame::UpdateGame(float dt) {
 				newSession = false;
 				playing = true;
 				matchTimer = 100;
+				world->SetCollectableCount(1);
 			}
 		}
 		else if (!isNetworkedGame)
@@ -563,7 +572,7 @@ bool TutorialGame::SelectObject() {
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
 			if (selectionObject) {	//set colour to deselected;
-				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				//selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 
 				renderer->DrawString("DEBUG INFO: ",
 					Vector2(10, 300), Vector4(0, 0, 1, 1));
@@ -699,7 +708,7 @@ void TutorialGame::InitWorld() {
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	/*for (int i = 0; i < 20; i++)
+	/*for (int i = 0; i < 10; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
@@ -708,7 +717,7 @@ void TutorialGame::InitWorld() {
 		world->IncrementCollectableCount();
 	}
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
