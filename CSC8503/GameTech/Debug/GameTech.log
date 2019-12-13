@@ -1,4 +1,21 @@
-﻿  Player.cpp
+﻿  Enemy.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005:  '_WINSOCKAPI_': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Player.cpp: note: see previous definition of '_WINSOCKAPI_'
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\winsock2.h(17,1): warning C4005: C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp: note: see previous definition of '_WINSOCKAPI_'
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(19,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(19,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(20,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(20,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(29,32): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(29,22): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(34,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(35,38): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(155,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(217,13): warning C4018:  '>=': signed/unsigned mismatch
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(234,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(234,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(235,41): warning C4244:  'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(235,32): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(245,27): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(245,17): warning C4244:  'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\b6038386\Documents\GitHub\Game_Tech\CSC8503\GameTech\Enemy.cpp(263,20): warning C4018:  '<': signed/unsigned mismatch
   GameTech.vcxproj -> C:\Users\b6038386\Documents\GitHub\Game_Tech\Win32\Debug\GameTech.exe

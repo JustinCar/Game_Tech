@@ -47,6 +47,7 @@ public:
 
 			std::cout << "Full Packet Received..." << std::endl;
 
+			(*first)->GetRenderObject()->SetColour(packet.colour);
 			(*first)->GetTransform().SetWorldPosition(packet.position);
 			(*first)->GetTransform().SetLocalOrientation(packet.orientation);
 		}

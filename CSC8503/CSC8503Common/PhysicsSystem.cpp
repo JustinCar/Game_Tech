@@ -322,6 +322,11 @@ void PhysicsSystem::HandleCollectable(GameObject* player, GameObject* collectabl
 		constraint = new PositionConstraint(player, collectable, maxDistance);
 	else
 		constraint = new PositionConstraint(p->getCollectables().back(), collectable, maxDistance);
+		
+	if (p->GetNetworkObject()->GetID() == 1000)
+		collectable->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+	else 
+		collectable->GetRenderObject()->SetColour(Vector4(1, 0, 0, 1));
 
 	Collectable* c = static_cast<Collectable*>(&(*collectable));
 	c->SetConstraint(constraint);

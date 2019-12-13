@@ -142,6 +142,7 @@ void TutorialGame::RestartNetworkedGame()
 			int xPos = rand() % 480;
 			int zPos = rand() % 420;
 			(*i)->GetTransform().SetWorldPosition(Vector3(xPos, 10, zPos));
+			(*i)->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 			collectableCounter++;
 		}
 	}
@@ -684,23 +685,25 @@ void TutorialGame::InitWorld() {
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	/*for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
-		AddAppleToWorld(Vector3(xPos, 10, zPos));
-		world->IncrementCollectableCount();
-	}*/
 
-	/*for (int i = 0; i < 0; i++)
+		AddAppleToWorld(Vector3(xPos, 40, zPos));
+		world->IncrementCollectableCount();
+	}
+
+	for (int i = 0; i < 100; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
-		AddBonusItemToWorld(offSet + Vector3(xPos, 10, zPos));
-		world->IncrementCollectableCount();
-	}*/
 
-	for (int i = 0; i < 6; i++) 
+		AddBonusItemToWorld(Vector3(xPos, 40, zPos));
+		world->IncrementCollectableCount();
+	}
+
+	for (int i = 0; i < 8; i++) 
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
@@ -848,8 +851,10 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos, int num) {
 
 	float	invCubeMass = 0.01;
 	int		numLinks = 55;
-	float	maxDistance = 1.5;
+	float	maxDistance = 1.2;
 	float	cubeDistance = 2;
+
+	int layerMask = 53;
 
 	Vector4 brown = Vector4(0.58, 0.29, 0, 1);
 
@@ -876,7 +881,7 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos, int num) {
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
 
 	start->setLayer(1);
-	start->setLayerMask(29);
+	start->setLayerMask(layerMask);
 
 	start->GetRenderObject()->SetColour(brown);
 	
@@ -884,7 +889,7 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos, int num) {
 	GameObject* end = AddCubeToWorld(endPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
 
 	end->setLayer(1);
-	end->setLayerMask(29);
+	end->setLayerMask(layerMask);
 
 	end->GetRenderObject()->SetColour(brown);
 
@@ -894,7 +899,7 @@ void TutorialGame::AddBridgeToWorld(Vector3 startPos, int num) {
 		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
 		
 		block->setLayer(1);
-		block->setLayerMask(29);
+		block->setLayerMask(layerMask);
 		
 		block->GetRenderObject()->SetColour(brown);
 		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
@@ -1103,6 +1108,7 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 
 	apple->GetPhysicsObject()->SetInverseMass(100.0f);
 	apple->GetPhysicsObject()->InitSphereInertia();
+	apple->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 
 	world->AddGameObject(apple);
 
@@ -1112,13 +1118,14 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 GameObject* TutorialGame::AddBonusItemToWorld(const Vector3& position) {
 	Collectable* box = new Collectable(20, position);
 
-	AABBVolume* volume = new AABBVolume(Vector3(0.15, 0.15, 0.15));
+	AABBVolume* volume = new AABBVolume(Vector3(0.8, 0.8, 0.8));
 	box->SetBoundingVolume((CollisionVolume*)volume);
-	box->GetTransform().SetWorldScale(Vector3(0.3, 0.3, 0.3));
+	box->GetTransform().SetWorldScale(Vector3(0.8, 0.8, 0.8));
 	box->GetTransform().SetWorldPosition(position);
 
 	box->SetRenderObject(new RenderObject(&box->GetTransform(), cubeMesh, nullptr, basicShader));
 	box->SetPhysicsObject(new PhysicsObject(&box->GetTransform(), box->GetBoundingVolume()));
+	box->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 
 	box->GetPhysicsObject()->SetInverseMass(100.0f);
 	box->GetPhysicsObject()->InitSphereInertia();

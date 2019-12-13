@@ -109,6 +109,7 @@ bool NetworkObject::WriteFullPacket(GamePacket**p) {
 
 	fp->score = playerScore;
 	fp->totalScore = playerTotalScore;
+	fp->fullState.colour = object.GetRenderObject()->GetColour();
 	fp->objectID				= networkID;
 	fp->fullState.position		= object.GetTransform().GetWorldPosition();
 	fp->fullState.orientation	= object.GetTransform().GetWorldOrientation();

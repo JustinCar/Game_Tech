@@ -71,7 +71,9 @@ namespace NCL {
 			float distanceFromPlayer;
 			float chaseRadius;
 			float attackRadius;
-			bool attacked;
+
+			float attackTimer;
+			float attackCooldown;
 
 			bool& isServerEnemy;
 

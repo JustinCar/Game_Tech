@@ -13,6 +13,9 @@ Enemy::Enemy(Vector3 position, GameWorld* world, bool& isServer) : gameWorld(wor
 	closestPlayer = player;
 	grid = new NavigationGrid("TestGrid3.txt");
 
+	attackTimer = 0;
+	attackCooldown = 10;
+
 	position.x = roundToNearestTen(position.x);
 	position.z = roundToNearestTen(position.z);
 
@@ -28,8 +31,8 @@ Enemy::Enemy(Vector3 position, GameWorld* world, bool& isServer) : gameWorld(wor
 
 	transform.SetWorldPosition(position);
 
-	timeToSpendIdle = 10.0f;
-	timeToSpendPatrolling = 10.0f;
+	timeToSpendIdle = rand() % 10 + 2;
+	timeToSpendPatrolling = rand() % 20 + 5;
 
 	timeSpentIdle = 0.0f;
 	timeSpentPatrolling = 0.0f;
@@ -37,7 +40,6 @@ Enemy::Enemy(Vector3 position, GameWorld* world, bool& isServer) : gameWorld(wor
 	distanceFromPlayer = 0.0f;
 	chaseRadius = 30.0f;
 	attackRadius = 10.0f;
-	attacked = false;
 
 	pathfindingOffSet = Vector3(0, 10, 0);
 	index = 0;
@@ -56,6 +58,8 @@ void Enemy::Update(float dt)
 	if (!isServerEnemy)
 		return;
 
+	attackTimer -= dt;
+
 	if (player && playerTwo)
 	{
 		if (Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition()) >
@@ -70,6 +74,11 @@ void Enemy::Update(float dt)
 			distanceFromPlayer = Vector3::Distance(transform.GetWorldPosition(), player->GetTransform().GetWorldPosition());
 		}
 	}
+
+	// Prevent enemy from continuing to chase after attacking
+	if (attackTimer > 0)
+		distanceFromPlayer = 1000;
+	
 		
 
 	stateMachine->Update(dt);
@@ -119,8 +128,6 @@ void Enemy::InitStateMachine()
 
 void Enemy::Chase(float dt)
 {
-	if (attacked)
-		attacked = false;
 
 	Player* p = static_cast<Player*>(&(*closestPlayer));
 
@@ -141,10 +148,8 @@ void Enemy::Chase(float dt)
 
 void Enemy::Attack(float dt)
 {
-	if (attacked)
-		return;
+	attackTimer = attackCooldown;
 
-	attacked = true;
 	Player* p = static_cast<Player*>(&(*closestPlayer));
 
 	for (int i = 0; i < p->getCollectables().size(); i++)
@@ -153,10 +158,15 @@ void Enemy::Attack(float dt)
 
 		gameWorld->RemoveConstraint(c->GetConstraint());
 		c->GetTransform().SetWorldPosition(c->GetOriginalPosition());
+		c->GetRenderObject()->SetColour(Vector4(1, 1, 0, 1));
 		c->setLayerMask(4);
 
 		p->getCollectables().pop();
 	}
+
+	pathNodes.clear();
+	index = 0;
+	GeneratePath();
 }
 
 void Enemy::Idle(float dt)
@@ -264,7 +274,7 @@ void Enemy::DisplayPathfinding() {
 	Vector3 up = pathNodes[0];
 	up.y += 30;
 
-	Debug::DrawLine(pathNodes[0] + pathfindingOffSet, up + pathfindingOffSet, Vector4(0, 0, 1, 1));
+	//Debug::DrawLine(pathNodes[0] + pathfindingOffSet, up + pathfindingOffSet, Vector4(0, 0, 1, 1));
 }
 
 int Enemy::roundToNearestTen(int num)
