@@ -21,6 +21,8 @@ TutorialGame::TutorialGame()	{
 
 	newSession = true;
 
+	fileName = "highscores";
+
 	goose = nullptr;
 
 	matchTimer = -1;
@@ -112,6 +114,7 @@ void TutorialGame::StartGame()
 
 void TutorialGame::RestartNetworkedGame()
 {
+	//StoreHighScore();
 	newSession = false;
 	playing = true;
 	world->setPlayerOneScore(0);
@@ -120,6 +123,7 @@ void TutorialGame::RestartNetworkedGame()
 	matchTimer = 100;
 	goose->GetNetworkObject()->resetScore();
 	playerTwo->GetNetworkObject()->resetScore();
+	physics->Clear();
 
 	if (isServer)
 	{
@@ -166,6 +170,20 @@ void TutorialGame::RenderScoreBoard()
 		renderer->DrawString("THEIR TOTAL SCORE: " + std::to_string(world->GetPlayerOneTotal()),
 			Vector2(400, 350), Vector4(0, 0, 1, 1));
 	}
+}
+
+void TutorialGame::StoreHighScore()
+{
+	std::ofstream myfile;
+	myfile.open(fileName, std::ifstream::out, std::ifstream::trunc);
+
+	myfile << "HIGH SCORES FROM LAST MATCH" << "\n";
+
+	myfile << "Player One (Blue): " << std::to_string(world->GetPlayerOneTotal()) << "\n";
+
+	myfile << "Player Two (Red): " << std::to_string(world->GetPlayerTwoTotal()) << "\n";
+
+	myfile.close();
 }
 
 void TutorialGame::RenderMenu()
@@ -314,16 +332,15 @@ void TutorialGame::UpdateGame(float dt) {
 			if (isServer)
 				RestartNetworkedGame();
 			else
+			{
 				newSession = false;
+				playing = true;
+				matchTimer = 100;
+			}
 		}
 		else if (!isNetworkedGame)
 		{
 			RenderMenu();
-		}
-		else if (isNetworkedGame && newSession)
-		{
-			playing = true;
-			StartGame();
 		}
 	}
 	else
@@ -341,11 +358,8 @@ void TutorialGame::UpdateGame(float dt) {
 		}
 		else 
 		{
-			/*if (Window::GetKeyboard()->KeyDown(KeyboardKeys::TAB))
-				RenderScoreBoard();*/
-
-			/*renderer->DrawString("COLLECTABLE COUNT: " + std::to_string(world->GetCollectableCount()),
-				Vector2(300, 300), Vector4(0, 0, 1, 1));*/
+			if (Window::GetKeyboard()->KeyDown(KeyboardKeys::TAB))
+				RenderScoreBoard();
 
 			if (isServer) 
 			{
@@ -685,7 +699,7 @@ void TutorialGame::InitWorld() {
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	for (int i = 0; i < 100; i++)
+	/*for (int i = 0; i < 20; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
@@ -694,14 +708,14 @@ void TutorialGame::InitWorld() {
 		world->IncrementCollectableCount();
 	}
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
 
 		AddBonusItemToWorld(Vector3(xPos, 40, zPos));
 		world->IncrementCollectableCount();
-	}
+	}*/
 
 	for (int i = 0; i < 8; i++) 
 	{

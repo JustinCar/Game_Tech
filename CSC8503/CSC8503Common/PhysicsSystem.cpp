@@ -28,16 +28,6 @@ void PhysicsSystem::SetGravity(const Vector3& g) {
 	gravity = g;
 }
 
-/*
-
-If the 'game' is ever reset, the PhysicsSystem must be
-'cleared' to remove any old collisions that might still
-be hanging around in the collision list. If your engine
-is expanded to allow objects to be removed from the world,
-you'll need to iterate through this collisions list to remove
-any collisions they are in.
-
-*/
 void PhysicsSystem::Clear() {
 	allCollisions.clear();
 }
@@ -114,17 +104,6 @@ void PhysicsSystem::Update(float dt) {
 	//std::cout << "Physics time taken: " << time << std::endl;
 }
 
-/*
-Later on we're going to need to keep track of collisions
-across multiple frames, so we store them in a set.
-
-The first time they are added, we tell the objects they are colliding.
-The frame they are to be removed, we tell them they're no longer colliding.
-
-From this simple mechanism, we we build up gameplay interactions inside the
-OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a 
-rocket launcher, gaining a point when the player hits the gold coin, and so on).
-*/
 void PhysicsSystem::UpdateCollisionList() {
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
 		if ((*i).framesLeft == numCollisionFrames) {
@@ -184,8 +163,7 @@ void PhysicsSystem::BasicCollisionDetection() {
 
 			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
 				ImpulseResolveCollision(*info.a, *info.b, info.point);
-				/*std::cout << " Collision between " << (*i) -> GetName()
-					<< " and " << (*j) -> GetName() << std::endl;*/
+				
 				info.framesLeft = numCollisionFrames;
 				allCollisions.insert(info);
 			}
@@ -193,12 +171,6 @@ void PhysicsSystem::BasicCollisionDetection() {
 	}
 }
 
-/*
-
-In tutorial 5, we start determining the correct response to a collision,
-so that objects separate back out. 
-
-*/
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject * physB = b.GetPhysicsObject();
@@ -351,15 +323,6 @@ bool PhysicsSystem::ShouldCollide(GameObject* a, GameObject* b)
 	return true;
 }
 
-/*
-
-Later, we replace the BasicCollisionDetection method with a broadphase
-and a narrowphase collision detection method. In the broad phase, we
-split the world up using an acceleration structure, so that we can only
-compare the collisions that we absolutely need to. 
-
-*/
-
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
 	QuadTree < GameObject* > tree(Vector2(1024, 1024), 7, 6);
@@ -397,11 +360,6 @@ void PhysicsSystem::BroadPhase() {
 
 }
 
-/*
-
-The broadphase will now only give us likely collisions, so we can now go through them,
-and work out if they are truly colliding, and if so, add them into the main collision list
-*/
 void PhysicsSystem::NarrowPhase() {
 	for (std::set < CollisionDetection::CollisionInfo >::iterator
 		i = broadphaseCollisions.begin();
@@ -417,15 +375,16 @@ void PhysicsSystem::NarrowPhase() {
 	}
 }
 
-/*
-Integration of acceleration and velocity is split up, so that we can
-move objects multiple times during the course of a PhysicsUpdate,
-without worrying about repeated forces accumulating etc. 
+bool PhysicsSystem::IsStatic(int layer)
+{
+	if (layer == 1 ||
+		layer == 5 ||
+		layer == 6)
+		return true;
 
-This function will update both linear and angular acceleration,
-based on any forces that have been accumulated in the objects during
-the course of the previous game frame.
-*/
+	return false;
+}
+
 void PhysicsSystem::IntegrateAccel(float dt) {
 	std::vector < GameObject* >::const_iterator first;
 	std::vector < GameObject* >::const_iterator last;
@@ -448,8 +407,7 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 		Vector3 accel = force * inverseMass;
 		
 		if (applyGravity && inverseMass > 0) {
-			accel += gravity; // don �t move infinitely heavy things
-
+			accel += gravity; 
 		}
 		
 		linearVel += accel * dt; // integrate accel !
@@ -469,12 +427,7 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 	}
 
 }
-/*
-This function integrates linear and angular velocity into
-position and orientation. It may be called multiple times
-throughout a physics update, to slowly move the objects through
-the world, looking for collisions.
-*/
+
 void PhysicsSystem::IntegrateVelocity(float dt) {
 	std::vector < GameObject* >::const_iterator first;
 	std::vector < GameObject* >::const_iterator last;
@@ -489,16 +442,16 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 
 		}
 		Transform & transform = (*i) -> GetTransform();
-		// Position Stuff
+		
 		Vector3 position = transform.GetLocalPosition();
 		Vector3 linearVel = object -> GetLinearVelocity();
 		position += linearVel * dt;
 		transform.SetLocalPosition(position);
-		// Linear Damping
+		
 		linearVel = linearVel * frameDamping;
 		object -> SetLinearVelocity(linearVel);
 
-		// Orientation Stuff
+		
 		Quaternion orientation = transform.GetLocalOrientation();
 		Vector3 angVel = object -> GetAngularVelocity();
 		
@@ -508,7 +461,7 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 		
 		transform.SetLocalOrientation(orientation);
 		
-		// Damp the angular velocity too
+		
 		angVel = angVel * frameDamping;
 		object -> SetAngularVelocity(angVel);
 
@@ -516,30 +469,18 @@ void PhysicsSystem::IntegrateVelocity(float dt) {
 
 }
 
-/*
-Once we're finished with a physics update, we have to
-clear out any accumulated forces, ready to receive new
-ones in the next 'game' frame.
-*/
 void PhysicsSystem::ClearForces() {
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
 
 	for (auto i = first; i != last; ++i) {
-		//Clear our object's forces for the next frame
+		
 		(*i)->GetPhysicsObject()->ClearForces();
 	}
 }
 
 
-/*
-
-As part of the final physics tutorials, we add in the ability
-to constrain objects based on some extra calculation, allowing
-us to model springs and ropes etc. 
-
-*/
 void PhysicsSystem::UpdateConstraints(float dt) {
 	std::vector<Constraint*>::const_iterator first;
 	std::vector<Constraint*>::const_iterator last;

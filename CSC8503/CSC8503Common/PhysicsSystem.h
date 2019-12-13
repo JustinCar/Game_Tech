@@ -45,6 +45,8 @@ namespace NCL {
 			void UpdateCollisionList();
 			void UpdateObjectAABBs();
 
+			bool IsStatic(int layer);
+
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 
 			GameWorld& gameWorld;

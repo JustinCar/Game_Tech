@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "Collectable.h"
 #include <string> 
+#include <iostream>
+#include <fstream>
 
 namespace NCL {
 	namespace CSC8503 {
@@ -64,6 +66,9 @@ namespace NCL {
 			Player* goose;
 			GameObject* playerTwo;
 			vector<Enemy*> enemies;
+
+			void StoreHighScore();
+			std::string fileName;
 
 			int secondPlayerScore;
 
