@@ -21,13 +21,10 @@ public:
 
 			packet = realPacket->fullState;
 
-			/*if (realPacket->objectID == 1000 ||
-				realPacket->objectID == 2000)
-				return;*/
-
 			if (realPacket->objectID == 1000)
 			{
 				world.setPlayerOneScore(realPacket->score);
+				world.SetPlayerOneTotal(realPacket->totalScore);
 				ghostGoose->GetTransform().SetWorldPosition(packet.position);
 				ghostGoose->GetTransform().SetLocalOrientation(packet.orientation);
 				return;
@@ -35,6 +32,7 @@ public:
 			else if (realPacket->objectID == 2000)
 			{
 				world.setPlayerTwoScore(realPacket->score);
+				world.SetPlayerTwoTotal(realPacket->totalScore);
 				controlledGoose->GetTransform().SetWorldPosition(packet.position);
 				//controlledGoose->GetTransform().SetLocalOrientation(packet.orientation);
 				return;

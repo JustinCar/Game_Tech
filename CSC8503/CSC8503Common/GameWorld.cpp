@@ -13,6 +13,14 @@ GameWorld::GameWorld()	{
 
 	quadTree = nullptr;
 
+	score = 0;
+
+	playerOneScore = 0;
+	playerTwoScore = 0;
+
+	playerOneTotalScore = 0;
+	playerTwoTotalScore = 0;
+
 	isServer = false;
 	isNetworkedGame = false;
 

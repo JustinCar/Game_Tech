@@ -46,7 +46,6 @@ namespace NCL {
 			void setPlayerTwo(GameObject* p) { playerTwo = p; };
 
 			void RotateTowards(Vector3 v);
-			
 
 		protected:
 			void GeneratePath();

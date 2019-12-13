@@ -8,6 +8,7 @@ namespace NCL {
 			int		objectID = -1;
 			NetworkState fullState;
 			int score;
+			int totalScore;
 
 			FullPacket() {
 				type = Full_State;
@@ -63,7 +64,12 @@ namespace NCL {
 
 			int GetID() { return networkID; };
 
-			void increaseScore(int s) { playerScore += s; };
+			void increaseScore(int s) { 
+				playerScore += s; 
+				playerTotalScore += s;
+			};
+
+			void resetScore() { playerScore = 0; };
 
 		protected:
 
@@ -89,6 +95,7 @@ namespace NCL {
 			int networkID;
 
 			int playerScore;
+			int playerTotalScore;
 		};
 	}
 }

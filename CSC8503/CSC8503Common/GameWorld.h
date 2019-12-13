@@ -77,6 +77,14 @@ namespace NCL {
 
 			bool GetIsServer() { return isServer; };
 			bool GetIsNetworkedGame() { return isNetworkedGame; };
+
+			void IncreasePlayerOneTotal(int i) { playerOneTotalScore += i; };
+			void SetPlayerOneTotal(int i) { playerOneTotalScore = i; };
+			int GetPlayerOneTotal() { return playerOneTotalScore; };
+
+			void IncreasePlayerTwoTotal(int i) { playerTwoTotalScore += i; };
+			void SetPlayerTwoTotal(int i) { playerTwoTotalScore = i; };
+			int GetPlayerTwoTotal() { return playerTwoTotalScore; };
 		protected:
 			void UpdateTransforms();
 			void UpdateQuadTree();
@@ -95,6 +103,9 @@ namespace NCL {
 
 			int playerOneScore;
 			int playerTwoScore;
+
+			int playerOneTotalScore;
+			int playerTwoTotalScore;
 
 			bool isServer;
 			bool isNetworkedGame;

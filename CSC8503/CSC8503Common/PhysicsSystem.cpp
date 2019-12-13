@@ -277,16 +277,24 @@ void PhysicsSystem::HandleScoreIncrease(GameObject* player)
 	{
 		Collectable* c = static_cast<Collectable*>(&(*p->getCollectables().front()));
 
+		int points = c->GetPoints();
+
 		if (!gameWorld.GetIsNetworkedGame())
-			gameWorld.increaseScore(c->GetPoints());
+			gameWorld.increaseScore(points);
 		else 
 		{
-			p->GetNetworkObject()->increaseScore(c->GetPoints());
+			p->GetNetworkObject()->increaseScore(points);
 
 			if (p->GetNetworkObject()->GetID() == 1000)
-				gameWorld.increasePlayerOneScore(c->GetPoints());
+			{
+				gameWorld.increasePlayerOneScore(points);
+				gameWorld.IncreasePlayerOneTotal(points);
+			}
 			else
-				gameWorld.increasePlayerTwoScore(c->GetPoints());
+			{
+				gameWorld.increasePlayerTwoScore(points);
+				gameWorld.IncreasePlayerTwoTotal(points);
+			}	
 		}
 
 		gameWorld.RemoveConstraint(c->GetConstraint());

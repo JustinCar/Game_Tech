@@ -8,6 +8,7 @@ NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	fullErrors  = 0;
 	networkID   = id;
 	playerScore = 0;
+	playerTotalScore = 0;
 }
 
 NetworkObject::~NetworkObject()	{
@@ -107,6 +108,7 @@ bool NetworkObject::WriteFullPacket(GamePacket**p) {
 	FullPacket* fp = new FullPacket();
 
 	fp->score = playerScore;
+	fp->totalScore = playerTotalScore;
 	fp->objectID				= networkID;
 	fp->fullState.position		= object.GetTransform().GetWorldPosition();
 	fp->fullState.orientation	= object.GetTransform().GetWorldOrientation();
