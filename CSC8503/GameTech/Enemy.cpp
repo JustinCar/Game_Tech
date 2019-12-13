@@ -93,7 +93,7 @@ void Enemy::Update(float dt)
 	}
 
 	// Prevent enemy from continuing to chase after attacking
-	if (attackTimer > 0)
+	if (attackTimer > 0 || !grid->ValidStartingPosition(player->GetTransform().GetWorldPosition()))
 		distanceFromPlayer = 1000;
 	
 		

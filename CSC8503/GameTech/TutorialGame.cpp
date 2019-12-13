@@ -26,7 +26,7 @@ TutorialGame::TutorialGame()	{
 	goose = nullptr;
 
 	matchTimer = -1;
-	gameOverScreenCoolDown = 2.0f;
+	gameOverScreenCoolDown = 20.0f;
 
 	buttonSelected = 1;
 	playing = false;
@@ -700,15 +700,10 @@ void TutorialGame::InitWorld() {
 
 	AddGooseToWorld(offSet + Vector3(50, 10, 0));
 
-	AddAppleToWorld(offSet + Vector3(55, 10, 0));
-	world->IncrementCollectableCount();
-	AddAppleToWorld(offSet + Vector3(60, 10, 0));
-	world->IncrementCollectableCount();
-
 	if (isNetworkedGame)
 		AddPlayerTwoToWorld(offSet + Vector3(50, 10, 0));
 
-	/*for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		int xPos = rand() % 480;
 		int zPos = rand() % 420;
@@ -724,7 +719,7 @@ void TutorialGame::InitWorld() {
 
 		AddBonusItemToWorld(Vector3(xPos, 40, zPos));
 		world->IncrementCollectableCount();
-	}*/
+	}
 
 	for (int i = 0; i < 8; i++) 
 	{

@@ -236,6 +236,10 @@ void PhysicsSystem::HandleCollision(GameObject* a, GameObject* b)
 
 	if (a->getLayer() == 5 && b->getLayer() == 2)
 		HandleScoreIncrease(b);
+
+	// Returned to island
+	if (b->getLayer() == 5 && a->getLayer() == 2)
+		HandleScoreIncrease(a);
 }
 
 void PhysicsSystem::HandleScoreIncrease(GameObject* player)
